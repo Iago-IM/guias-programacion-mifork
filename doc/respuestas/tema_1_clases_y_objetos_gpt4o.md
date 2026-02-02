@@ -161,7 +161,7 @@ Finalmente, combinar **`static` con `final`** es habitual para definir **constan
 ### Respuesta
 Para compilar un programa Java desde la línea de comandos se emplea el compilador `javac`. Este comando toma un archivo `.java` y genera uno o varios ficheros `.class` que contienen el *bytecode*. Por ejemplo, si se tiene una clase pública llamada `Ejercicio1` en `Ejercicio1.java`<span style="color:purple;">\* </span>, se compila con `javac Ejercicio1.java`. Tras la compilación, el programa se ejecuta con el comando java, `java Ejercicio1`, indicando el nombre de la clase **sin** la extensión `.class`, ya que la herramienta `java` busca automáticamente ese archivo en el directorio actual.
 
-<span style="color:purple;">\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase.\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase.> </span>
+<span style="color:purple;">\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase.\*> </span>
 
 Java se considera un lenguaje **compilado e interpretado al mismo tiempo**. Primero se compila a *bytecode*, un formato intermedio independiente del sistema operativo. Después, ese *bytecode* es ejecutado por la **Máquina Virtual de Java (JVM)**, que actúa como un intérprete optimizado. Este modelo permite que el mismo programa funcione en distintos sistemas sin cambiar el código fuente, siempre que exista una JVM disponible para esa plataforma.
 
@@ -174,21 +174,109 @@ Los archivos `.class` contienen el **bytecode**, una representación binaria del
 ## 11. En el código anterior de la clase `Punto` ¿Qué es `new`? ¿Qué es un **constructor**? Pon un ejemplo de constructor en una clase `Empleado` que tenga DNI, nombre y apellidos
 
 ### Respuesta
+`new` es el operador que **crea un objeto** en Java: reserva memoria para él, construye la instancia y devuelve una **referencia** para poder usarla. En el ejemplo de `Punto`, `new Punto()` significa “crear un `Punto` nuevo”, y el resultado se guarda en una variable (la referencia), que permite acceder a sus atributos y métodos. A diferencia de C/C++, no se está “instanciando en la pila” como una variable automática típica, sino creando un objeto gestionado por el entorno de ejecución (normalmente en el *heap*).
+
+Un **constructor** es un método “especial” que se ejecuta **justo al crear** un objeto con `new`. Sirve para **inicializar** el estado inicial del objeto (por ejemplo, asignar valores a sus atributos). Se reconoce porque **se llama igual que la clase** y **no tiene tipo de retorno** (ni siquiera `void`). Si no se define ninguno, Java proporciona un constructor por defecto sin parámetros, pero en cuanto se define uno propio, ese constructor por defecto deja de generarse automáticamente.
+
+Ejemplo de clase `Empleado` con atributos `dni`, `nombre` y `apellidos`, y un constructor que inicializa esos campos:
+
+```java
+class Empleado {
+    String dni;
+    String nombre;
+    String apellidos;
+
+    // Constructor
+    Empleado(String dni, String nombre, String apellidos) {
+        this.dni = dni;
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+    }
+}
+
+// Ejemplo de uso
+class PruebaEmpleado {
+    public static void main(String[] args) {
+        Empleado e = new Empleado("12345678A", "Ana", "Pérez Gómez");
+        System.out.println(e.dni + " - " + e.nombre + " " + e.apellidos);
+    }
+}
+```
 
 
 ## 12. ¿Qué es la referencia `this`? ¿Se llama igual en todos los lenguajes? Pon un ejemplo del uso de `this` en la clase `Punto`
 
 ### Respuesta
-
+En el constructor de la pregunta anterior aparece `this`, que se utiliza para referirse al **objeto que se está construyendo** y distinguir sus atributos (`this.dni`) de los parámetros del constructor (`dni`). De esta forma, al ejecutar `new Empleado(...)` se garantiza que la instancia nace ya con un DNI, nombre y apellidos coherentes, en lugar de quedar con valores vacíos o `null`.
 
 ## 13. Añade ahora otro nuevo método que se llame `distanciaA`, que reciba un `Punto` como parámetro y calcule la distancia entre `this` y el punto proporcionado
 
 ### Respuesta
+```java
+class Punto {
+    int x; // visibilidad por defecto
+    int y; // visibilidad por defecto
 
+    double calculaDistanciaAOrigen() {
+        return Math.sqrt(x * x + y * y);
+    }
+
+    double distanciaA(Punto otro) {
+        int dx = otro.x - this.x;
+        int dy = otro.y - this.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+}
+
+public class Ejercicio1 {
+    public static void main(String[] args) {
+        Punto a = new Punto();
+        a.x = 5;
+        a.y = 3;
+
+        Punto b = new Punto();
+        b.x = 1;
+        b.y = 6;
+
+        System.out.println("Distancia de a al origen: " + a.calculaDistanciaAOrigen());
+        System.out.println("Distancia de a a b: " + a.distanciaA(b));
+    }
+}
+```
 
 ## 14. El paso del `Punto` como parámetro a un método, es **por copia** o **por referencia**, es decir, si se cambia el valor de algún atributo del punto pasado como parámetro, dichos cambios afectan al objeto fuera del método? ¿Qué ocurre si en vez de un `Punto`, se recibiese un entero (`int`) y dicho entero se modificase dentro de la función? 
 
 ### Respuesta
+En Java, el paso de parámetros es **siempre por valor (por copia)**, pero hay que distinguir **qué valor** se está copiando. Si el parámetro es un objeto como `Punto`, lo que se copia es la **referencia** al objeto (una “dirección”/identificador), no el objeto completo. Por eso, **dentro del método se puede modificar el estado del mismo objeto** y esos cambios se ven fuera: el método y el código que llama están apuntando al **mismo** objeto. En cambio, si dentro del método se reasigna el parámetro para que apunte a otro `Punto` nuevo, esa reasignación **no** afecta al de fuera, porque solo cambia la copia local de la referencia.
+
+```java
+static void cambiaCoordenadas(Punto p) {
+    p.x = 100;          // Modifica el MISMO objeto -> se verá fuera
+    p.y = 200;
+}
+
+static void reasigna(Punto p) {
+    p = new Punto();    // Solo cambia la referencia local -> NO se verá fuera
+    p.x = 7;
+    p.y = 8;
+}
+```
+
+Si en lugar de `Punto` se recibe un `int`, entonces el “valor” copiado es el **número** en sí (tipo primitivo). Al modificarlo dentro del método, solo se modifica la **copia local**, y **no** cambia la variable original fuera del método. Esto es lo que suele entenderse como “por copia” en C con tipos básicos.
+
+```java
+static void incrementa(int n) {
+    n = n + 1;          // Solo cambia la copia local
+}
+
+public static void main(String[] args) {
+    int a = 10;
+    incrementa(a);
+    System.out.println(a); // Imprime 10
+}
+```
+
+En resumen: con **objetos** se copia la **referencia**, así que cambiar atributos (`p.x = ...`) sí afecta fuera; con **primitivos** como `int`, se copia el **valor numérico**, así que cambiarlo dentro no afecta fuera.
 
 
 ## 15. ¿Qué es el método `toString()` en Java? ¿Existe en otros lenguajes? Pon un ejemplo de `toString()` en la clase `Punto` en Java
