@@ -50,9 +50,11 @@ Rust es un caso a parte, es seguro en memoria pero también tiene ventajas de lo
 
 ### Respuesta
 Ensamblador: secuencia de instrucciones y saltos arbitrarios (similar a los .bat de Windows).
-&darr;
+&darr;  
+
 Programación estructurada: se quita el salto arbitrario (tenemos bifunciones como if y swith, iteración como los bucles for y while...).
-&darr;
+&darr;  
+
 Programación modular: tenemos "librerías", "paquetes", "interfaces"... para encapsular y reutilizar.
 
 ## 4. ¿Qué tres elementos definen a un objeto en programación orientada a objetos?
@@ -66,12 +68,20 @@ Programación modular: tenemos "librerías", "paquetes", "interfaces"... para en
 
 ### Respuesta
 - Clase &rarr; Molde que define el estado y el comportamiento
-- Objetos 
+- Objetos &rarr; entidad concreta creada a partir de una clase. Varios objetos de la misma clase pueden tener distintos estados.
 
 
 ## 6. ¿Dónde se almacenan en memoria los objetos? ¿Es igual en todos los lenguajes? ¿Qué es la **recolección de basura**? 
 
 ### Respuesta
+
+En lenguajes como Java, los **objetos se almacenan normalmente en el *heap***, una zona de memoria diseñada para datos cuyo tamaño y tiempo de vida no se conocen de antemano. El *heap* permite crear objetos en tiempo de ejecución mediante `new`, y su uso es gestionado por la máquina virtual, no por el programador. En cambio, las variables que solo almacenan referencias a esos objetos suelen ubicarse en la **pila (*stack*)**, pero el objeto real permanece en el *heap*.
+
+No todos los lenguajes gestionan la memoria de la misma manera. En C++, por ejemplo, los objetos pueden ir tanto al *stack* como al *heap*, dependiendo de si se crean de forma automática o con `new`. En cambio, lenguajes gestionados como Java o C# colocan casi todos los objetos en el *heap* y utilizan mecanismos automáticos para controlar su ciclo de vida. Otros lenguajes con modelos diferentes, como Python o JavaScript, también almacenan la mayoría de sus objetos en un *heap* gestionado, aunque su implementación interna pueda variar.
+
+La **recolección de basura** (*garbage collection*) es un proceso automático que libera memoria ocupada por objetos que ya no son accesibles desde el programa. En lugar de que el programador deba liberar manualmente la memoria —como ocurre en C o C++ con `free` o `delete`—, el recolector analiza qué objetos ya no pueden ser usados y los elimina. Este mecanismo reduce errores típicos de gestión manual, como fugas de memoria o accesos a memoria liberada.
+
+El recolector puede funcionar con distintos algoritmos, pero su objetivo siempre es mantener el *heap* limpio sin intervención directa del programador. Aunque facilita la programación, también implica que la liberación de memoria no es instantánea ni totalmente predecible, ya que depende del funcionamiento interno del recolector.
 
 
 
@@ -83,7 +93,7 @@ Un método es cualquiera de las funciones definidas dentro de una clase.
 La sobrecarga de métodos es la posibilidad de crear métodos dentro de una clase con el mismo nombre, pero cambiando el tipo y/o número de sus parámetros.
 
 Ejemplo:
-```
+```java
 class Calculadora {
 	// sin estado
 
@@ -109,27 +119,26 @@ main() {
 
 ### Respuesta
 
-```
-struct Punto {
-	int x;
-	int y;
+```java
+class Punto {
+    int x; // visibilidad por defecto (package-private)
+    int y; // visibilidad por defecto (package-private)
+
+    double calculaDistanciaAOrigen() {
+        // Distancia de (x,y) a (0,0)
+        return Math.sqrt(x * x + y * y);
+    }
 }
 
-double calcularDistanciaAlOrigen(struct Punto p){
-	// Distancia de p a (0,0)
-	return sqrt(p.x * p.x + p.y * p.y)
-}
+public class Ejercicio1 {
+    public static void main(String[] args) {
+        Punto miPunto = new Punto();
+        miPunto.x = 5;
+        miPunto.y = 3;
 
-main() {
-	Punto miPunto;
-	miPunto.x = 5;
-	miPunto.y = 3;
-}
-
-class Ejercicio1 {
-	public static void main(String[], args) {
-		
-	}
+        double d = miPunto.calculaDistanciaAOrigen();
+        System.out.println("Distancia al origen: " + d);
+    }
 }
 ```	
 
@@ -137,10 +146,29 @@ class Ejercicio1 {
 ## 9. ¿Cuál es el punto de entrada en un programa en Java? ¿Qué es `static` y para qué vale? ¿Sólo se emplea para ese método `main`? ¿Para qué se combina con `final`?
 
 ### Respuesta
+El **punto de entrada** de un programa en Java es siempre el método  
+`public static void main(String[] args)`. La máquina virtual de Java comienza la ejecución buscando exactamente ese método dentro de alguna clase pública accesible. No se permite cambiar ni su nombre ni su firma, porque es la convención que utiliza la JVM para iniciar el programa.
+
+La palabra clave **`static`** indica que un elemento pertenece a la **clase**, no a los objetos creados a partir de ella. En el caso de `main`, se utiliza porque la JVM necesita poder llamarlo sin crear primero una instancia de la clase. De esta manera, `main` existe “por sí mismo”, y puede ejecutarse sin depender de ningún objeto.
+
+El modificador `static` no se emplea solo en `main`. También se usa en **métodos auxiliares**, **constantes**, **atributos compartidos** y funciones que no dependen del estado concreto de un objeto. Cuando algo es `static`, todas las instancias de la clase comparten ese mismo recurso.
+
+Finalmente, combinar **`static` con `final`** es habitual para definir **constantes**, es decir, valores globales e inmutables accesibles sin crear objetos. Por ejemplo, `static final double PI = 3.14159;` permite declarar un valor que nunca cambia y que pertenece a la clase completa, no a cada instancia.
+
 
 ## 10. Intenta ejecutar un poco de Java de forma básica, con los comandos `javac` y `java`. ¿Cómo podemos compilar el programa y ejecutarlo desde linea de comandos? ¿Java es compilado? ¿Qué es la **máquina virtual**? ¿Qué es el *byte-code* y los ficheros `.class`?
 
 ### Respuesta
+Para compilar un programa Java desde la línea de comandos se emplea el compilador `javac`. Este comando toma un archivo `.java` y genera uno o varios ficheros `.class` que contienen el *bytecode*. Por ejemplo, si se tiene una clase pública llamada `Ejercicio1` en `Ejercicio1.java`<span style="color:purple;">\* </span>, se compila con `javac Ejercicio1.java`. Tras la compilación, el programa se ejecuta con el comando java, `java Ejercicio1`, indicando el nombre de la clase **sin** la extensión `.class`, ya que la herramienta `java` busca automáticamente ese archivo en el directorio actual.
+
+<span style="color:purple;">\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase.\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase.> </span>
+
+Java se considera un lenguaje **compilado e interpretado al mismo tiempo**. Primero se compila a *bytecode*, un formato intermedio independiente del sistema operativo. Después, ese *bytecode* es ejecutado por la **Máquina Virtual de Java (JVM)**, que actúa como un intérprete optimizado. Este modelo permite que el mismo programa funcione en distintos sistemas sin cambiar el código fuente, siempre que exista una JVM disponible para esa plataforma.
+
+La **máquina virtual** es un software que simula una computadora ideal diseñada para ejecutar *bytecode* Java. Se encarga de tareas como la gestión de memoria, la recolección de basura y la optimización en tiempo de ejecución. Este enfoque desacopla el código del hardware real, lo que facilita la portabilidad y añade una capa de seguridad y control sobre la ejecución del programa.
+
+Los archivos `.class` contienen el **bytecode**, una representación binaria del programa que no es directamente ejecutable por el procesador físico, pero sí por la JVM. Este bytecode sirve como formato estándar para distribuir programas Java, ya que puede ejecutarse en cualquier sistema donde haya instalada una máquina virtual compatible. De este modo, el ciclo completo de Java combina portabilidad, optimización y control automático del entorno de ejecución.
+
 
 
 ## 11. En el código anterior de la clase `Punto` ¿Qué es `new`? ¿Qué es un **constructor**? Pon un ejemplo de constructor en una clase `Empleado` que tenga DNI, nombre y apellidos
