@@ -37,9 +37,12 @@ Por favor, escribe en impersonal las respuestas.
 ## 2. Cita cuatro lenguajes populares que permitan la programación orientada a objetos
 
 ### Respuesta
+
+|Lenguajes				|Notas 																	|
+|-----------------------|-----------------------------------------------------------------------|
 |Python, JavaScript, PHP| LENGUAJES DINÁMICOS (se programa más rápido pero son menos eficientes)|
-|Java, C#| LENGUAJES COMPILADOS GC (Seguros en memoria)|
-|Rust?, C++...| LENGUAJES COMPILADOS NO GC|
+|Java, C#				| LENGUAJES COMPILADOS GC (Seguros en memoria)							|
+|Rust?, C++...			| LENGUAJES COMPILADOS NO GC											|
 
 Rust es un caso a parte, es seguro en memoria pero también tiene ventajas de los lenguajes no GC.
 
@@ -55,13 +58,15 @@ Programación modular: tenemos "librerías", "paquetes", "interfaces"... para en
 ## 4. ¿Qué tres elementos definen a un objeto en programación orientada a objetos?
 
 ### Respuesta
-- Identidad.
+- Identidad: todo objeto tiene una identidad única (piénsalo como su propia dirección en memoria).
 - Estado: el valor de sus atributos (campos).
 - Comportamiento: los métodos (funciones) del objeto.
 
 ## 5. ¿Qué es una clase? ¿Es lo mismo que un objeto? ¿Qué es una instancia? ¿Todos los lenguajes orientados a objetos manejan el concepto de clase?
 
 ### Respuesta
+- Clase &rarr; Molde que define el estado y el comportamiento
+- Objetos 
 
 
 ## 6. ¿Dónde se almacenan en memoria los objetos? ¿Es igual en todos los lenguajes? ¿Qué es la **recolección de basura**? 
@@ -69,14 +74,64 @@ Programación modular: tenemos "librerías", "paquetes", "interfaces"... para en
 ### Respuesta
 
 
+
 ## 7. ¿Qué es un método? ¿Qué es la **sobrecarga de métodos**? 
 
 ### Respuesta
+Un método es cualquiera de las funciones definidas dentro de una clase.
+
+La sobrecarga de métodos es la posibilidad de crear métodos dentro de una clase con el mismo nombre, pero cambiando el tipo y/o número de sus parámetros.
+
+Ejemplo:
+```
+class Calculadora {
+	// sin estado
+
+	int sumar(int a, int b) {
+		return a + b;
+	}
+
+	double sumar(double a, double b) {
+		return a + b;
+	}
+}
+
+main() {
+	Calculadora miCalculadora = new Calculadora();
+
+	int suma1 = miCalculadora.sumar(4, 6);
+	double suma2 = miCalculadora.sumar(4.3, 6.7);
+}
+```
 
 
 ## 8. Ejemplo mínimo de clase en Java, que se llame Punto, con dos atributos, x e y, con un método que se llame `calculaDistanciaAOrigen`, que calcule la distancia a la posición 0,0. Por sencillez, los atributos deben tener visibilidad por defecto. Crea además un ejemplo de uso con una instancia y uso del método
 
 ### Respuesta
+
+```
+struct Punto {
+	int x;
+	int y;
+}
+
+double calcularDistanciaAlOrigen(struct Punto p){
+	// Distancia de p a (0,0)
+	return sqrt(p.x * p.x + p.y * p.y)
+}
+
+main() {
+	Punto miPunto;
+	miPunto.x = 5;
+	miPunto.y = 3;
+}
+
+class Ejercicio1 {
+	public static void main(String[], args) {
+		
+	}
+}
+```	
 
 
 ## 9. ¿Cuál es el punto de entrada en un programa en Java? ¿Qué es `static` y para qué vale? ¿Sólo se emplea para ese método `main`? ¿Para qué se combina con `final`?
