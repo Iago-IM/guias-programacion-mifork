@@ -18,20 +18,46 @@ Por favor, escribe en impersonal las respuestas.
 ## 1. ¿Cuáles son las cuatro características básicas de la programación orientada a objetos? Describe brevemente cada una
 
 ### Respuesta
+- Abstracción; olvidarse de detalles para:
+	* Manejar mejor temas complejos
+	* Facilitar la modificación (el mantenimiento)
+
+- Encapsulación: 
+	* Unir información y funciones sobre esa información en un mismo artefacto (como en las clases de Python).
+	* Ocultar partes al exterior.
+
+- Armonía:
+	* Crear jerarquías (como cuando una clase de Python parte de otra).
+	* La herencia (o jerarquía de tipos) permite la reutilización de código aunque no es la mejor forma. La herencia es además un mecanismo de abstracción.
+
+- Polimorfismo:
+	* Misma función, distintas implementaciones en función del tipo (facilita la abstracción).
 
 
 ## 2. Cita cuatro lenguajes populares que permitan la programación orientada a objetos
 
 ### Respuesta
+|Python, JavaScript, PHP| LENGUAJES DINÁMICOS (se programa más rápido pero son menos eficientes)|
+|Java, C#| LENGUAJES COMPILADOS GC (Seguros en memoria)|
+|Rust?, C++...| LENGUAJES COMPILADOS NO GC|
 
+Rust es un caso a parte, es seguro en memoria pero también tiene ventajas de los lenguajes no GC.
 
 ## 3. Los paradigmas anteriores a la POO, ¿Qué es la **programación estructurada**? y, todavía mejor, ¿Qué es la **programación modular**?
 
 ### Respuesta
+Ensamblador: secuencia de instrucciones y saltos arbitrarios (similar a los .bat de Windows).
+&darr;
+Programación estructurada: se quita el salto arbitrario (tenemos bifunciones como if y swith, iteración como los bucles for y while...).
+&darr;
+Programación modular: tenemos "librerías", "paquetes", "interfaces"... para encapsular y reutilizar.
 
 ## 4. ¿Qué tres elementos definen a un objeto en programación orientada a objetos?
 
 ### Respuesta
+- Identidad.
+- Estado: el valor de sus atributos (campos).
+- Comportamiento: los métodos (funciones) del objeto.
 
 ## 5. ¿Qué es una clase? ¿Es lo mismo que un objeto? ¿Qué es una instancia? ¿Todos los lenguajes orientados a objetos manejan el concepto de clase?
 
