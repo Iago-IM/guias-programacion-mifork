@@ -50,9 +50,11 @@ Rust es un caso a parte, es seguro en memoria pero también tiene ventajas de lo
 
 ### Respuesta
 Ensamblador: secuencia de instrucciones y saltos arbitrarios (similar a los .bat de Windows).
+
 &darr;  
 
 Programación estructurada: se quita el salto arbitrario (tenemos bifunciones como if y swith, iteración como los bucles for y while...).
+
 &darr;  
 
 Programación modular: tenemos "librerías", "paquetes", "interfaces"... para encapsular y reutilizar.
@@ -282,14 +284,79 @@ En resumen: con **objetos** se copia la **referencia**, así que cambiar atribut
 ## 15. ¿Qué es el método `toString()` en Java? ¿Existe en otros lenguajes? Pon un ejemplo de `toString()` en la clase `Punto` en Java
 
 ### Respuesta
+En Java, `toString()` es un método definido en la clase base `Object`, por lo que **todo objeto lo tiene**. Su finalidad es devolver una **representación textual** del objeto (un `String`) para mostrarlo de forma legible, por ejemplo al imprimirlo con `System.out.println(objeto)`. Si no se redefine, la versión por defecto suele ser poco útil (típicamente algo como `NombreClase@hash`), así que lo normal es **sobrescribirlo** para que describa el estado relevante del objeto (sus atributos principales).
+
+Este concepto existe en muchos otros lenguajes, aunque no siempre con el mismo nombre exacto. En Python se usa `__str__` (y a veces `__repr__`), en C++ suele lograrse con la sobrecarga del operador `<<` para poder enviar el objeto a un `ostream`, y en JavaScript también existe `toString()` aunque su personalización depende del modelo de prototipos. En todos los casos se persigue lo mismo: facilitar la conversión del objeto a texto para depuración, trazas o salida por consola.
+
+A continuación se muestra un ejemplo de `toString()` para una clase `Punto` que devuelva el formato `(x, y)`. Se recomienda usar `@Override` para que el compilador detecte errores si la firma no coincide con la del método heredado.
+
+```java
+class Punto {
+    int x; // visibilidad por defecto
+    int y; // visibilidad por defecto
+
+    Punto(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+}
+
+public class Ejemplo {
+    public static void main(String[] args) {
+        Punto p = new Punto(5, 3);
+        System.out.println(p);            // llama implícitamente a p.toString()
+        System.out.println(p.toString()); // llamada explícita
+    }
+}
+```
 
 
 ## 16. Reflexiona: ¿una clase es como un `struct` en C? ¿Qué le falta al `struct` para ser como una clase y las variables de ese tipo ser instancias?
 
 
 ### Respuesta
+Si bien un `struct` de C tiene **atributos** (permite agrupar datos bajo un mismo tipo como las clases), **no** puede tener **métodos asociados**.
+
+Además, un `struct` carece de mecanismos fundamentales de las clases: no tiene **constructores**, no permite **ocultación de datos** mediante niveles de visibilidad, no admite **herencia** ni **polimorfismo**, ni dispone de un sistema automático de creación de instancias como `new`. Las variables de tipo `struct` en C son simples bloques de memoria con una plantilla fija.
+
+En resumen, un `struct` de C puede verse como la “mitad de una clase”: aporta los **datos**, pero no el **comportamiento**, ni las herramientas que permiten tratar esos datos como **objetos** completos dentro de un modelo orientado a objetos.
 
 
 ## 17. Quitemos un poco de magia a todo esto: ¿Como se podría “emular”, con `struct` en C, la clase `Punto`, con su función para calcular la distancia al origen? ¿Qué ha pasado con `this`?
 
 ### Respuesta
+Para “emular” en C la clase `Punto` con su método `calculaDistanciaAOrigen`, se define un `struct` para agrupar `x` e `y` y se escribe una función “externa” que reciba un `Punto` y calcule la distancia. En C, como no existen métodos asociados al tipo, la función se nombra de forma convencional (por ejemplo `Punto_calculaDistanciaAOrigen`) y se le pasa el dato explícitamente. Si se quiere evitar copiar el `struct`, se pasa un **puntero**; si el `struct` es pequeño, pasarlo por valor también sería válido, pero el puntero se parece más al estilo “orientado a objetos”.
+
+Lo que ha pasado con `this` es que deja de ser implícito: en Java, `this` es una referencia automática al objeto sobre el que se invoca el método; en C, esa referencia se convierte en un parámetro explícito, normalmente llamado `self`, `p` o `this`. Es decir, el `this` de Java se corresponde con el puntero que se pasa a la función en C (`const struct Punto* self`). Por eso, dentro de la función se accede con `self->x` y `self->y` (operador `->`), que equivale conceptualmente a `this.x` y `this.y` en Java.
+
+```c
+#include <stdio.h>
+#include <math.h>
+
+struct Punto {
+    int x;
+    int y;
+};
+
+/* "Método" emulado: recibe el objeto explícitamente */
+double Punto_calculaDistanciaAOrigen(const struct Punto* self) {
+    return sqrt((double)self->x * self->x + (double)self->y * self->y);
+}
+
+int main(void) {
+    struct Punto miPunto;
+    miPunto.x = 5;
+    miPunto.y = 3;
+
+    double d = Punto_calculaDistanciaAOrigen(&miPunto);
+    printf("Distancia al origen: %f\n", d);
+    return 0;
+}
+```
+
+En resumen, la “magia” de un método en una clase consiste, en gran parte, en que el lenguaje **inyecta** ese primer parámetro oculto (`this`) y permite escribir la llamada como `miPunto.calculaDistanciaAOrigen()` en lugar de `Punto_calculaDistanciaAOrigen(&miPunto)`. La diferencia clave no es la fórmula, sino la **sintaxis** y el hecho de que Java liga de forma natural datos y operaciones, mientras que en C hay que mantener esa asociación por convención.
