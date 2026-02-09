@@ -77,6 +77,19 @@ Programación modular: tenemos "librerías", "paquetes", "interfaces"... para en
 
 ### Respuesta
 
+-Los objetos se almacenan en el Heap en la mayoría de los lenguajes.
+-No es así en todos, otros permiten también el stack (como c++).
+
+Qué ventajas tiene usar el Heap?
+·Facilita la programación.
+·La memoria es dinámica, se decide lo que se ocupa en tiempo de ejecución.
+·La vida de los objetos del Heap no depende de la vida de la función que los crea.
+Problemas del Heap:
+·Hay que encargarse de liberar memoria no usada del heap:
+    a) Manual &rarr; difícil y propenso a bugs ("memory leak"), aunque más rápido.
+    b) Con recolector de basura &rarr; peor rendimiento pero ganas en salud mental.
+
+
 En lenguajes como Java, los **objetos se almacenan normalmente en el *heap***, una zona de memoria diseñada para datos cuyo tamaño y tiempo de vida no se conocen de antemano. El *heap* permite crear objetos en tiempo de ejecución mediante `new`, y su uso es gestionado por la máquina virtual, no por el programador. En cambio, las variables que solo almacenan referencias a esos objetos suelen ubicarse en la **pila (*stack*)**, pero el objeto real permanece en el *heap*.
 
 No todos los lenguajes gestionan la memoria de la misma manera. En C++, por ejemplo, los objetos pueden ir tanto al *stack* como al *heap*, dependiendo de si se crean de forma automática o con `new`. En cambio, lenguajes gestionados como Java o C# colocan casi todos los objetos en el *heap* y utilizan mecanismos automáticos para controlar su ciclo de vida. Otros lenguajes con modelos diferentes, como Python o JavaScript, también almacenan la mayoría de sus objetos en un *heap* gestionado, aunque su implementación interna pueda variar.
@@ -148,7 +161,26 @@ public class Ejercicio1 {
 ## 9. ¿Cuál es el punto de entrada en un programa en Java? ¿Qué es `static` y para qué vale? ¿Sólo se emplea para ese método `main`? ¿Para qué se combina con `final`?
 
 ### Respuesta
-El **punto de entrada** de un programa en Java es siempre el método  
+
+#### Static:
+-Permite usar un método o atributo sin necesidad de hacer una instancia de la clase. Se antepone el nombre de la clase, no de una instancia. Ej.: `main`, `Integer.parseInt()`, `Math.sqrt()`...
+
+-En estos métodos NUNCA existe `this`
+
+-En atributos, solo se guardan en un único lugar de memoria.
+
+#### Final:
+-Indica que un valor no se puede asignar en el futuro.
+
+-Si se junta con static para crear una variable, estamos creando una constante. Ej.:
+```java
+class Punto{
+    double static final PI = 3.14;
+}
+```
+
+
+El **punto de entrada** de un programa en Java es siempre el método 
 `public static void main(String[] args)`. La máquina virtual de Java comienza la ejecución buscando exactamente ese método dentro de alguna clase pública accesible. No se permite cambiar ni su nombre ni su firma, porque es la convención que utiliza la JVM para iniciar el programa.
 
 La palabra clave **`static`** indica que un elemento pertenece a la **clase**, no a los objetos creados a partir de ella. En el caso de `main`, se utiliza porque la JVM necesita poder llamarlo sin crear primero una instancia de la clase. De esta manera, `main` existe “por sí mismo”, y puede ejecutarse sin depender de ningún objeto.
@@ -161,6 +193,10 @@ Finalmente, combinar **`static` con `final`** es habitual para definir **constan
 ## 10. Intenta ejecutar un poco de Java de forma básica, con los comandos `javac` y `java`. ¿Cómo podemos compilar el programa y ejecutarlo desde linea de comandos? ¿Java es compilado? ¿Qué es la **máquina virtual**? ¿Qué es el *byte-code* y los ficheros `.class`?
 
 ### Respuesta
+
+<span style="color:purple;">\Archivos .java(texto) ---javac (compilador)---> Archivos .class (binario, lenguaje "byte code")</span> ---java (intérprete)---> <span style="color:darkblue;">\JVM (Java Virtual Machine)</span>
+
+
 Para compilar un programa Java desde la línea de comandos se emplea el compilador `javac`. Este comando toma un archivo `.java` y genera uno o varios ficheros `.class` que contienen el *bytecode*. Por ejemplo, si se tiene una clase pública llamada `Ejercicio1` en `Ejercicio1.java`<span style="color:purple;">\* </span>, se compila con `javac Ejercicio1.java`. Tras la compilación, el programa se ejecuta con el comando java, `java Ejercicio1`, indicando el nombre de la clase **sin** la extensión `.class`, ya que la herramienta `java` busca automáticamente ese archivo en el directorio actual.
 
 <span style="color:purple;">\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase.\*> </span>
@@ -176,6 +212,12 @@ Los archivos `.class` contienen el **bytecode**, una representación binaria del
 ## 11. En el código anterior de la clase `Punto` ¿Qué es `new`? ¿Qué es un **constructor**? Pon un ejemplo de constructor en una clase `Empleado` que tenga DNI, nombre y apellidos
 
 ### Respuesta
+#### New:
+1) Reserva memoria para un nuevo objeto.
+2) Ejecuta un constructor con ese objeto como objeto actual (this).
+3) Devuelve ese nuevo objeto (now es una expresión).
+
+
 `new` es el operador que **crea un objeto** en Java: reserva memoria para él, construye la instancia y devuelve una **referencia** para poder usarla. En el ejemplo de `Punto`, `new Punto()` significa “crear un `Punto` nuevo”, y el resultado se guarda en una variable (la referencia), que permite acceder a sus atributos y métodos. A diferencia de C/C++, no se está “instanciando en la pila” como una variable automática típica, sino creando un objeto gestionado por el entorno de ejecución (normalmente en el *heap*).
 
 Un **constructor** es un método “especial” que se ejecuta **justo al crear** un objeto con `new`. Sirve para **inicializar** el estado inicial del objeto (por ejemplo, asignar valores a sus atributos). Se reconoce porque **se llama igual que la clase** y **no tiene tipo de retorno** (ni siquiera `void`). Si no se define ninguno, Java proporciona un constructor por defecto sin parámetros, pero en cuanto se define uno propio, ese constructor por defecto deja de generarse automáticamente.
@@ -209,6 +251,15 @@ class PruebaEmpleado {
 ## 12. ¿Qué es la referencia `this`? ¿Se llama igual en todos los lenguajes? Pon un ejemplo del uso de `this` en la clase `Punto`
 
 ### Respuesta
+
+#### This:
+-Una referencia al objeto actual.
+
+-Útil para desambiguar, para aclarar.
+
+-No disponible en métodos `static`.
+
+
 En el constructor de la pregunta anterior aparece `this`, que se utiliza para referirse al **objeto que se está construyendo** y distinguir sus atributos (`this.dni`) de los parámetros del constructor (`dni`). De esta forma, al ejecutar `new Empleado(...)` se garantiza que la instancia nace ya con un DNI, nombre y apellidos coherentes, en lugar de quedar con valores vacíos o `null`.
 
 ## 13. Añade ahora otro nuevo método que se llame `distanciaA`, que reciba un `Punto` como parámetro y calcule la distancia entre `this` y el punto proporcionado
@@ -249,6 +300,15 @@ public class Ejercicio1 {
 ## 14. El paso del `Punto` como parámetro a un método, es **por copia** o **por referencia**, es decir, si se cambia el valor de algún atributo del punto pasado como parámetro, dichos cambios afectan al objeto fuera del método? ¿Qué ocurre si en vez de un `Punto`, se recibiese un entero (`int`) y dicho entero se modificase dentro de la función? 
 
 ### Respuesta
+Al pasar objetos en Java se pasan copias de la referencia.
+
+####Resumen:
+-Datos primitivos (int, long, double, char, boolean): se pasan por **COPIA**.
+-Objetos: se pasa una **COPIA DE LA REFERENCIA**.
+
+"Idea de implementación" &rarr; Es como si hubiese un tipo primitivo más: "ref"
+
+
 En Java, el paso de parámetros es **siempre por valor (por copia)**, pero hay que distinguir **qué valor** se está copiando. Si el parámetro es un objeto como `Punto`, lo que se copia es la **referencia** al objeto (una “dirección”/identificador), no el objeto completo. Por eso, **dentro del método se puede modificar el estado del mismo objeto** y esos cambios se ven fuera: el método y el código que llama están apuntando al **mismo** objeto. En cambio, si dentro del método se reasigna el parámetro para que apunte a otro `Punto` nuevo, esa reasignación **no** afecta al de fuera, porque solo cambia la copia local de la referencia.
 
 ```java
