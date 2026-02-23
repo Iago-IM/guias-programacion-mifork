@@ -19,6 +19,11 @@ Por favor, escribe en impersonal las respuestas.
 
 ### Respuesta
 
+Encapsulación es como un escudo, añade protección a mi clase, la cual es un artefacto con estado y comportamiento, que permite ocultar miembros para:
+-Garantizar que mi estado interno es siempre válido.
+-Evitar que otro código dependa o acceda a partes que no quiero.
+-Facilitamos poder cambiar partes sin afectar a otros.
+
 La encapsulación busca agrupar los datos (estado) y las funciones que operan sobre esos datos (comportamiento) en una única entidad o unidad lógica, conocida como clase. Desde la perspectiva de C/C++ clásico, es similar a tomar un `struct` y empaquetar dentro de él también las funciones que lo manipulan, evitando tener los datos por un lado y las funciones globales por el otro. Por su parte, la ocultación de información busca restringir el acceso directo a los detalles internos de esa unidad desde el exterior, exponiendo únicamente lo estrictamente necesario.
 
 La ocultación de información aporta numerosas ventajas fundamentales en el diseño de software. En primer lugar, previene la modificación accidental o indebida de los datos internos, garantizando que el estado del objeto siempre sea consistente. Además, reduce la complejidad del sistema, ya que el código externo no necesita conocer los detalles de implementación interna para interactuar con el objeto.
@@ -28,6 +33,8 @@ Finalmente, facilita enormemente el mantenimiento y la evolución del código. A
 ## 2. ¿Qué se entiende por la **interfaz pública** de un objeto o clase en POO? Describe brevemente cómo se relaciona con la ocultación de información.
 
 ### Respuesta
+
+Interfaz pública: los miembros que se ven desde otras clases, es decir, lo que no está oculto.
 
 La interfaz pública de una clase es el conjunto de métodos (y ocasionalmente atributos, aunque no es recomendable) que están declarados con un nivel de acceso público y que, por tanto, pueden ser invocados desde cualquier otra parte del programa. Se puede entender como un "contrato" o un panel de control que la clase ofrece al mundo exterior para que interactúen con ella, definiendo qué puede hacer el objeto sin revelar cómo lo hace.
 
@@ -39,6 +46,11 @@ Gracias a esta relación, el código cliente (quien usa la clase) pasa a depende
 
 ### Respuesta
 
+La interfaz pública no es fácil de cambiar ya que tiene más consecuencias que si cambio partes ocultas.
+"Cada método público que añado es un compromiso"
+
+Hay que tener en cuenta la retrocompatibilidad.
+
 Diseñar con cuidado la interfaz pública es crucial porque, una vez que una clase se integra en un sistema, otras partes del código (o incluso sistemas de terceros) comenzarán a depender de esos métodos públicos. Si la interfaz expone detalles innecesarios o está mal diseñada, se genera un alto grado de acoplamiento, haciendo que el sistema sea rígido y propenso a errores ante cualquier actualización.
 
 Cambiar una interfaz pública no es fácil una vez que el código está en uso. Si se modifica la firma de un método público (su nombre, sus parámetros o su valor de retorno) o se elimina, será necesario modificar y recompilar todo el código externo que hacía llamadas a dicho método. Por ello, se recomienda aplicar el principio de exponer la menor cantidad de métodos posibles, garantizando que la interfaz sea estable y duradera.
@@ -46,6 +58,15 @@ Cambiar una interfaz pública no es fácil una vez que el código está en uso. 
 ## 4. ¿Qué son las **invariantes de clase** y por qué la ocultación de información nos ayuda?
 
 ### Respuesta
+
+Son condiciones que se cumplen durante toda la vida de los objetos de una clase. Se pueden expresar como expresiones booleanas y normalmente se refieren al estado interno.
+El tipo de dato puede ser también una invariante de clase (aunque en Java esto es automático).
+
+Ejemplos:
+·Persona debe tener edad >= 0.
+·Usuario debe tener contraseña de más de 5 caracteres.
+
+La ocultación del estado interno permite asegurar la integridad de las invariantes de clase ya que los datos solo se modifican por métodos públicos que pueden comprobar la validez de los nuevos valores.
 
 Las invariantes de clase son condiciones, reglas o restricciones sobre el estado de un objeto que deben cumplirse siempre para que dicho objeto sea válido durante toda su vida útil. Por ejemplo, en una clase que representa una fracción matemática, una invariante sería que el denominador nunca puede ser igual a cero; o en una clase que represente una fecha, que el día no puede ser mayor a 31.
 
@@ -70,7 +91,16 @@ public class Punto {
     }
 }
 
+/*
+Interfaz pública:
+-Punto
+-Distancia al origen
+*/
 ```
+
+Private: miembros solo accesibles desde el código de la propia clase.
+
+Public: miembros accesibles desde cualquier código de otras clases.
 
 En este ejemplo, la interfaz pública de la clase `Punto` está compuesta únicamente por su constructor (`Punto(double x, double y)`) y por el método `calcularDistanciaAOrigen()`. Estos son los únicos elementos a los que se puede acceder libremente desde otras clases para crear y manipular objetos de este tipo.
 
@@ -80,6 +110,11 @@ El modificador `public` significa que el elemento es accesible desde cualquier o
 
 ### Respuesta
 
+Private: clases internas (no las veremos) y miembros
+
+Public: clases y miembros
+
+
 Los modificadores de visibilidad `public` y `private` se aplican principalmente a los miembros de una clase: los atributos (las variables que guardan el estado) y los métodos (las funciones que definen el comportamiento). También es muy común y necesario aplicarlos a los constructores, determinando desde dónde se puede instanciar el objeto.
 
 Además de los miembros internos, el modificador `public` se puede aplicar a la declaración de la clase en sí misma (haciéndola accesible desde cualquier paquete del proyecto). Cabe destacar que una clase de nivel superior (la clase principal en un archivo) no puede ser declarada como `private`, pero las clases anidadas (clases definidas dentro de otras clases) sí pueden llevar el modificador `private` para uso exclusivo de la clase contenedora.
@@ -87,6 +122,12 @@ Además de los miembros internos, el modificador `public` se puede aplicar a la 
 ## 7. En POO, la visibilidad puede ser pública o privada, pero ¿existen más tipos de visibilidad? ¿Qué ocurre en Java? ¿Y en otros lenguajes?
 
 ### Respuesta
+
+Protected: miembros accesibles desde clases.
+
+Sin modificador o "package private": miembros accesibles desde otras clases del mismo paquete.
+
+
 
 Sí, existen más tipos de visibilidad diseñados para gestionar la herencia y la organización en módulos. En Java existen cuatro niveles de acceso: público (`public`), privado (`private`), protegido (`protected`) y un nivel por defecto conocido como "package-private". El nivel `protected` permite el acceso dentro de la misma clase, clases del mismo paquete y subclases que heredan de ella. El nivel por defecto (que se aplica cuando no se escribe ningún modificador) restringe el acceso estrictamente a las clases que se encuentran dentro del mismo paquete.
 
@@ -100,6 +141,9 @@ Los miembros de instancia privados están ocultos para **(a) otras clases**. Un 
 
 ```java
     // Método a añadir dentro de la clase Punto
+
+	//private double x;
+	//private double y;
     public double calcularDistanciaAPunto(Punto otro) {
         double difX = this.x - otro.x; // Se accede directamente al atributo privado 'x' del objeto 'otro'
         double difY = this.y - otro.y; // Se accede directamente al atributo privado 'y' del objeto 'otro'
@@ -113,6 +157,29 @@ Como se observa en el código, el método pertenece a la clase `Punto` (ejecutá
 ## 9. ¿Qué son los métodos "getter" y "setter" en los lenguajes orientados a objetos?
 
 ### Respuesta
+
+Los getter acceden a un dato privado, los setter lo modifican.
+
+Siguiendo con el ejemplo del punto:
+```java
+double getX() {
+	return this.x;
+}
+
+void setX(double x) {
+	this.x = x
+}
+
+double getY() {
+	return this.y;
+}
+
+void setY(double y) {
+	this.y = y;
+}
+```
+
+No se pueden poner porque sí, ya que modifican la interfaz pública.
 
 Los métodos "getter" (accesores) y "setter" (mutadores) son funciones de la interfaz pública cuyo único propósito es permitir la lectura o escritura, respectivamente, de un atributo privado específico. Por convención, sus nombres se forman con los prefijos `get` o `set` seguidos del nombre del atributo (por ejemplo, `getX()` o `setX(double nuevoValor)`).
 
