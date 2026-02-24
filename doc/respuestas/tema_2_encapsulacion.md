@@ -197,6 +197,9 @@ El objetivo es prevenir estados inválidos o caídas del programa (bugs) asegura
 
 ### Respuesta
 
+Miembros de clase: asociados a la clase, compartidos por todas las instancias. &rarr; En el caso de métodos NO existe `this`.
+
+Miembros de instacia: asociados siempre a una instancia.
 Un miembro de instancia (ya sea atributo o método) pertenece a un objeto concreto. Cada vez que se crea un nuevo objeto usando `new`, este recibe su propia copia independiente de los atributos de instancia (como la `x` y la `y` de cada objeto `Punto`). Por el contrario, un miembro de clase pertenece a la clase en su totalidad, independientemente de cuántos objetos se hayan instanciado. Es análogo a una variable o función global en C, pero contenida conceptualmente dentro del espacio de nombres de la clase, y su valor es compartido por absolutamente todas las instancias.
 
 Los miembros de clase también se pueden y, por lo general, se deben ocultar aplicando el modificador `private`. Las reglas de encapsulación se aplican exactamente igual: si un miembro de clase guarda un estado global interno que no debe ser manipulado libremente desde fuera (como un contador de objetos creados), debe declararse como privado y exponerse solo mediante métodos de clase públicos si fuera estrictamente necesario.
@@ -204,6 +207,11 @@ Los miembros de clase también se pueden y, por lo general, se deben ocultar apl
 ## 12. Brevemente: ¿Tiene sentido que los constructores sean privados?
 
 ### Respuesta
+
+Tiene sentido si:
+-Quiero usar objetos solo a través de "métodos factoría"
+-La clase solo tiene miembros clase.
+-Controlar el número de instancias que se vea.
 
 Sí, tiene mucho sentido y es una práctica común en ciertos patrones de diseño. Cuando un constructor es declarado como `private`, se impide que cualquier otra clase exterior pueda utilizar la palabra clave `new` para instanciar objetos de esa clase.
 
@@ -252,6 +260,7 @@ En este ejemplo, `maxX` y `maxY` son atributos privados de la clase. Cada vez qu
 
 ### Respuesta
 
+Los métodos factoría sirven para crear nuevas instancias. Es un método estático (lo cuál es lógico porque no tengo instancia antes de usarlo).
 ```java
     public static Punto crearPuntoRedondeado(double x, double y) {
         double xRedondeada = Math.round(x);
@@ -273,7 +282,7 @@ public class Punto {
     private double[] coordenadas;
 
     // El constructor mantiene su firma pública intacta
-    public Punto(double x, double y) {
+    public Punto(double x, double y) { // Esto no se toca
         this.coordenadas = new double[2];
         this.coordenadas[0] = x;
         this.coordenadas[1] = y;
@@ -293,6 +302,8 @@ Este cambio demuestra el inmenso poder de la encapsulación y la ocultación de 
 ## 16. Si un atributo va a tener un método "getter" y "setter" públicos, ¿no es mejor declararlo público? ¿Cuál es la convención más habitual sobre los atributos, que sean públicos o privados? ¿Tiene esto algo que ver con las "invariantes de clase"?
 
 ### Respuesta
+
+Si fuesen métodos públicos perderíamos la capacidad de cambiarlos y de garantizar las invariantes de clase.
 
 Aunque pueda parecer redundante crear métodos para simplemente leer o escribir una variable, declarar el atributo como público rompe la encapsulación. La convención casi absoluta en la programación orientada a objetos es que todos los atributos deben ser privados. Al usar "getters" y "setters", se establece una capa de separación entre el dato y el mundo exterior, lo que permite cambiar el comportamiento interno en el futuro sin modificar los contratos externos.
 
