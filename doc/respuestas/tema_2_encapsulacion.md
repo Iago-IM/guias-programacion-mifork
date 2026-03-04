@@ -303,6 +303,12 @@ Este cambio demuestra el inmenso poder de la encapsulación y la ocultación de 
 
 ### Respuesta
 
+No se hacen públicos para:
+* Poder garantizar invariantes de clase.
+* Poder cambiar la representación interna.
+
+La regla por defecto es: atributos siempre privados y métodos de clase para obtenerlos solo cuando sea necesario.
+
 Si fuesen métodos públicos perderíamos la capacidad de cambiarlos y de garantizar las invariantes de clase.
 
 Aunque pueda parecer redundante crear métodos para simplemente leer o escribir una variable, declarar el atributo como público rompe la encapsulación. La convención casi absoluta en la programación orientada a objetos es que todos los atributos deben ser privados. Al usar "getters" y "setters", se establece una capa de separación entre el dato y el mundo exterior, lo que permite cambiar el comportamiento interno en el futuro sin modificar los contratos externos.
@@ -313,6 +319,11 @@ Esta práctica está íntimamente ligada a las invariantes de clase. Si un atrib
 
 ### Respuesta
 
+* Inmutable: su estado no cambia.
+* Modificador: cualquier método que cambia el estado interno, por ejemplo, un setter.
+
+Las clases inmutables tienen la ventaja de no hacer clases mutables por defecto.
+
 Una clase inmutable es aquella cuyas instancias no pueden ver modificado su estado (sus datos internos) una vez que el objeto ha sido construido. Todos sus datos se inicializan en el constructor de forma definitiva. Un método modificador es cualquier función en la clase que altera uno o más atributos del estado interno del objeto; por tanto, los "setters" son métodos modificadores por definición, pero no los únicos (por ejemplo, un método `trasladar(double dx, double dy)` también modificaría las coordenadas sin ser un "setter" estricto).
 
 El diseño de clases inmutables presenta notables ventajas. Elimina una gran cantidad de errores relacionados con el paso por referencia (donde una función modifica un objeto de forma inesperada afectando al resto del programa). Además, los objetos inmutables son inherentemente seguros en entornos de programación concurrente (multihilo), ya que múltiples partes del programa pueden leer el objeto simultáneamente sin riesgo de que los datos cambien en medio de la lectura.
@@ -320,6 +331,8 @@ El diseño de clases inmutables presenta notables ventajas. Elimina una gran can
 ## 18. ¿Es recomendable incluir métodos "setter" siempre y como convención?
 
 ### Respuesta
+
+No porque entonces estaríamos haciendo siempre clases mutables.
 
 No, incluir métodos "setter" por defecto para todos los atributos es considerado un antipatrón en el diseño orientado a objetos. Aunque formalmente se mantiene la sintaxis de la encapsulación al tener variables privadas, lógicamente se expone todo el estado del objeto a manipulación externa, lo que destruye gran parte de los beneficios de la ocultación de información.
 
@@ -329,6 +342,8 @@ Lo más recomendable es crear únicamente los métodos "setter" que el comportam
 
 ### Respuesta
 
+La clase **`String` en Java es inmutable**. Esto implica que, una vez creada una cadena, su contenido no de puede modificar. Cualquier operación que parezca alterarla (concatenar, reemplazar, convertir mayúsculas/minúsculas...) en realidad crea un nuevo objeto `String` y deja intacto el original.
+
 En Java, la clase `String` es estrictamente inmutable. Una vez que se crea un objeto de tipo texto en memoria, su secuencia de caracteres jamás puede cambiar. Por lo tanto, cuando se realiza una operación de concatenación de dos cadenas, el lenguaje crea un tercer objeto `String` completamente nuevo en una ubicación de memoria distinta, el cual contiene el resultado de la unión de las dos cadenas originales.
 
 Si se requiere realizar una operación que implique concatenar texto múltiples veces de forma iterativa (como construir una cadena larga dentro de un bucle `for`), utilizar objetos `String` provocará la creación de cientos de objetos temporales, saturando la memoria y consumiendo ciclos de procesamiento en su recolección. En estos casos, se debe utilizar la clase `StringBuilder` (o `StringBuffer`), las cuales proporcionan una estructura mutable diseñada específicamente para añadir o modificar caracteres de forma eficiente antes de extraer la cadena `String` definitiva.
@@ -336,6 +351,12 @@ Si se requiere realizar una operación que implique concatenar texto múltiples 
 ## 20. En POO ¿Cómo se comparan objetos de una misma clase? ¿Por su contenido o por su identidad? ¿Qué es el método equals en Java? ¿Qué hace por defecto? ¿Cómo se deben comparar dos cadenas en Java? 
 
 ### Respuesta
+
+Resumen:
+*   `==` → compara **identidad** (si son el mismo objeto en memoria).
+*   `equals` → compara **contenido (estado)** (si tienen el mismo valor en sus atributos).
+*   En el caso de las cadenas (`String`), se debe utilizar absolutamente siempre el método `equals()` para compararlas
+
 
 En POO, la comparación de objetos puede realizarse bajo dos criterios. El primero es por su "identidad" (usando el operador `==`), que verifica si dos variables apuntan exactamente al mismo espacio de memoria (al mismo objeto físico). El segundo es por su "contenido" o valor, que verifica si dos objetos diferentes contienen internamente información equivalente, aunque habiten espacios de memoria distintos.
 
@@ -347,6 +368,15 @@ En el caso específico de las cadenas de texto (`String`), se debe utilizar abso
 
 ### Respuesta
 
+Existen en lenguajes que tienen tipos primitivos (algunos como Ruby solo tienen objetos).
+* int <-> Integer
+* float <-> Float
+* char <-> Character
+
+**Ventajas:**
+* Añadirle comportamiento
+* Puede cambiar en contextos donde se necesitan objetos (list<t>)
+
 Las clases "wrapper" (envoltorios) son clases especiales diseñadas para encapsular los tipos de datos primitivos clásicos (como el `int`, `double` o `char` heredados de C) dentro de un objeto real. En Java, cada primitivo tiene su correspondiente clase envoltorio (`Integer` para `int`, `Double` para `double`, etc.), lo que permite tratar números y caracteres básicos como verdaderos objetos dentro del paradigma.
 
 Actualmente, este proceso suele ser automático en lenguajes modernos mediante mecanismos conocidos como "Autoboxing" (convertir un primitivo a su clase wrapper automáticamente) y "Unboxing" (extraer el primitivo del objeto). La ventaja principal es que estas clases wrapper permiten usar números en colecciones y estructuras de datos que requieren estrictamente objetos (como las listas dinámicas `ArrayList`), además de proporcionar métodos estáticos útiles para la conversión de formatos (como transformar una cadena a número).
@@ -356,6 +386,9 @@ No todos los lenguajes necesitan clases wrapper. En lenguajes de programación q
 ## 22. ¿En POO qué es un **tipo de dato enumerado**? ¿En Java, un tipo de dato enumerado es una clase? ¿Qué ventajas tienen en términos de encapsulación los enumerados en Java?
 
 ### Respuesta
+
+* Enumerado es un tipo con un número determinado de valores.
+* En Java, el enumerado es una clase cuyas instancias son finitas. 
 
 Un tipo de dato enumerado (`enum`) es una construcción que permite definir un conjunto limitado y predeterminado de valores constantes posibles para una variable, como los días de la semana, las estaciones del año o los estados de un proceso. En lugar de usar números enteros o cadenas mágicas sueltas, se restringe el dominio a opciones fijas.
 
@@ -409,7 +442,3 @@ public enum Mes {
 En este código se puede observar cómo el tipo enumerado actúa como una clase robusta. Cada instancia (desde `ENERO` hasta `DICIEMBRE`) llama implícitamente al constructor privado con sus datos característicos. Los atributos internos han sido declarados como `private final`, lo que garantiza que una vez creado el mes, nadie pueda alterar sus características (inmutabilidad).
 
 Los métodos relativos a las estaciones utilizan la propia identidad del objeto (`this`) para evaluar la lógica en función del parámetro provisto para el hemisferio. Cabe destacar que, al haber meses de transición donde se produce el solsticio o equinoccio (como marzo, junio, septiembre y diciembre), se ha considerado de forma lógica que dichos meses abarcan días de ambas estaciones concurrentes para devolver el valor `true` correspondientemente.
-
----
-
-Para continuar de forma interactiva, ¿desea que se le proporcionen algunos ejercicios prácticos con código para afianzar estos conceptos de clases, interfaces y envoltorios en Java?
