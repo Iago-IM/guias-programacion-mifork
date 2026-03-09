@@ -95,9 +95,14 @@ int main(void) {
 
 ### Respuesta
 
-Una **excepción** es un objeto/evento que **interrumpe** el flujo normal cuando ocurre una condición anómala (error) y **transfiere el control** a un manejador (`catch`).  
-**Objetivos:**
+**Resumen**: 
+* Excepciones -> en situaciones atípicas
+* Cuando las implementamos -> nos permite indicar más claramente el error.
+* Cuando las llamamos -> facilita la lógica normal de la reacción o manejo de las situaciones complejas.
 
+Una **excepción** es un objeto/evento que **interrumpe** el flujo normal cuando ocurre una condición anómala (error) y **transfiere el control** a un manejador (`catch`).  
+
+**Objetivos:**
 *   Separar la **lógica normal** de la **lógica de error**.
 *   Permitir **propagación automática** hasta un lugar donde tenga sentido gestionar el error.
 *   Facilitar **limpieza de recursos** (con `finally` o equivalentes) y aportar **información rica** (tipo, mensaje, causa, pila).
