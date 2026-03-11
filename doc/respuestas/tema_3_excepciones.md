@@ -213,6 +213,12 @@ class RaizNegativaException extends IllegalArgumentException {
 
 ### Respuesta
 
+Cualquier objeto excepción lleva:
+1) Un mensaje
+2) La traza de pila (muy útil para depurar)
+3) Opcionalmente, una "causa", que es otra excepción
+
+
 *   **Tipo** (clase): naturaleza del problema.
 *   **Mensaje** descriptivo.
 *   **Causa** encadenada (otra excepción que originó esta).
@@ -227,16 +233,24 @@ En C solemos tener **códigos** (`errno`) y menos contexto; en Java llega al man
 
 ### Respuesta
 
-*   Sí, puede haber **varios `catch`**.
-*   **Se ejecuta solo uno**: el **primero** cuyo tipo sea compatible.
-*   Orden recomendado: **más específico → más general**.
-*   Existe **multi-catch**: `catch (IOException | SQLException ex)`.
+*   Puede haber más de un catch
+*   Solo se ejecuta UNO:
+    +   Se va comprobando por orden de declaración del cath --> IMPORTA EL ORDEN
+    +   Orden obligatorio: **más específico → más general**.
+    +   El primero que encaje es el que se ejecuta
+
+*   Existe el **multi-catch**: `catch (IOException | SQLException ex)`.
+
+
+Nota: las excepciones más específicas son un tipo de las más generales
 
 ***
 
 ## 9. Si las excepciones producen rupturas en el código llamador, ¿cómo podemos garantizar que se ejecuta siempre finalmente un código necesario para cierre de ficheros, liberacion de recursos, antes de que continúe propagándose la excepción? Pon un ejemplo en Java con `finally`, tanto con `catch` como sin él.
 
 ### Respuesta
+
+El `finally` se ejecuta SIEMPRE que se haya entrado en el try (haya excepciones o no)
 
 ```java
 // Con catch
@@ -282,29 +296,40 @@ static int demo() {
 
 ### Respuesta
 
-*   **Controladas (checked):** el compilador **exige** `try-catch` o `throws`. Normalmente **recuperables** y **externas** (E/S, red).
-*   **No controladas (unchecked):** heredan de **`RuntimeException`**; **no** es obligatorio declararlas ni capturarlas. Normalmente **errores de programación** o **violaciones de contrato**.
+La gestión de las excepciones es diferente dependiendo del lenguaje, pero la clasificación en el fondo es siempre la misma. En Java:
+
+* No controladas (unchecked): típicamente errores de programación que una vez solventados no vuelven a ocurrir. **No** estamos obligados a controlarlas con try-catch/throws.
+
+* Excepciones controladas (checked): típicamente errores por causas externas y que siempre pueden llegar a ocurrir (que no dependen de nosotros) como, por ejemplo, errores de entrada/salida. **Estamos obligados** a controlarlas con try-catch/throws
+
 
 **Ejemplos típicos:**
 
 *   **Checked:** `IOException`, `SQLException`, `FileNotFoundException`.
 *   **Unchecked:** `IllegalArgumentException`, `NullPointerException`, `IndexOutOfBoundsException`, `ArithmeticException`.
 
-**Preferir `checked` cuando:**
+Esquema con algunas excepciones:
+*   **RuntimeException (No controladas)**:
+    +   IlegalArgumentException
+    +   NullPointerException
+    +   ArrayIndexOutOfBoundsException
+*   **IOException (Controladas)**:
+    +   AccessDeniedException
+
+**Preferir controladas cuando:**
 
 1.  Fallos de **E/S** o **red** que el llamador puede **reintentar** o **informar** (archivo no encontrado, timeout).
 2.  Acceso a **BD** donde el llamador decide **transacción alternativa**.
 3.  **Carga de configuración** externa que el usuario puede **corregir**.
 4.  **Protocolos** remotos con **timeouts** recuperables.
 
-**Preferir `unchecked` cuando:**
+**Preferir no controladas cuando:**
 
 1.  **Precondiciones inválidas** del API (argumentos fuera de rango).
 2.  **Bugs lógicos**: NPE, índice fuera de rango.
 3.  **Estados imposibles** por contrato: `IllegalStateException`.
 4.  Fallos que **no** deben intentarse recuperar localmente.
 
-`RuntimeException` es la superclase de las **unchecked**.
 
 ***
 
@@ -312,14 +337,18 @@ static int demo() {
 
 ### Respuesta
 
+Cuando tenemos una excepción controlada tenemos dos opciones, manejar la excepción con un try catch o desentendernos del error con el throw mandándolo a quién llame la función (el llamador). Si manejamos la excepción y la función devuelve un valor (por ejemplo, un string en una función para leer un archivo) debemos usar el finally.
+
 `throws` en la **firma** declara que un método **puede lanzar** ciertas **checked exceptions**.  
 Sirve para **delegar** la gestión al **llamador**, que decidirá capturar o volver a declarar. Es una alternativa a capturar localmente y forma parte del **contrato** del método.
 
 ***
 
-## 13. Pon un ejemplo en Java de firma de método que incluya `throws`, de una función que abre un fichero pero que declara que no le interesa menejar la excepción de si el fichero no existe, sino que se propague hacia arriba. Eso sí, acuérdate del `finally`.
+## 13. Pon un ejemplo en Java de firma de método que incluya `throws`, de una función que abre un fichero pero que declara que no le interesa manejar la excepción de si el fichero no existe, sino que se propague hacia arriba. Eso sí, acuérdate del `finally`.
 
 ### Respuesta
+
+REVISAR: Cuando editamos un método público, añadir un throws puede romper la retrocompatibilidad por lo que podemos no poner el catch en la función y así delegar el error.
 
 ```java
 import java.io.*;
@@ -359,6 +388,8 @@ public class Lector {
 
 ### Respuesta
 
+Se hace por propósitos de documentación, pero no es lo habitual.
+
 *   **Se puede** declarar `RuntimeException` en `throws`, pero **no es necesario**.
 *   El llamador **no está obligado** a capturarla; lo hará **solo** si quiere **interceptar** para registrar, transformar o continuar.
 *   Tiene **sentido documental**: explicitar en la API que un método puede lanzar p. ej. `IllegalArgumentException` o `UnsupportedOperationException`.
@@ -368,6 +399,8 @@ public class Lector {
 ## 15. ¿Cuándo se recomienda usar excepciones controladas, como `IOException`, y cuándo no controladas como `IllegalArgumentException`? ¿Existen en todos los lenguajes ambas opciones? En los que sólo existe una opción, ¿cuál es la más habitual?
 
 ### Respuesta
+
+No hay ambas opciones en todos los lenguajes. La más típica es la de "no controladas" (Rust, por ejemplo, tiene `panic` para no controladas y emplea un tipo de retorno especial para controlar excepciones controladas). Para Java las excepciones son situaciones atípicas que siempre pueden ocurrir. Para Rust, en cambio, la filosofía es radicalmente opuesta.
 
 *   **Usa checked** para condiciones **externas y recuperables**: E/S, red, permisos, recursos externos.
 *   **Usa unchecked** para **errores del programador** o **violaciones de contrato**: argumentos inválidos, estado ilegal.
@@ -420,6 +453,8 @@ try {
 ## 17. ¿En qué consiste que una excepción sea la **"causa"** de otra excepción? Pon un ejemplo en Java, donde capturemos una excepción de bajo nivel y la encapsulemos en otra personalizada de alto nivel. Cuando una excepción sale por pantalla y tiene una causa, ¿se ve?
 
 ### Respuesta
+
+Cuando generamos un tipo de excepción propia para tener nuestra propia semántica podemos incluír en ella la excepción original (la de toda la vida). Así conservamos la traza entera.
 
 Una excepción puede **envolver** otra como su **causa** (chaining). Preserva la raíz del problema y la contextualiza.
 
