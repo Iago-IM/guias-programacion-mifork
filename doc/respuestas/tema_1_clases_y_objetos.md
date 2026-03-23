@@ -81,13 +81,13 @@ Programación modular: tenemos "librerías", "paquetes", "interfaces"... para en
 -No es así en todos, otros permiten también el stack (como c++).
 
 Qué ventajas tiene usar el Heap?
-·Facilita la programación.
-·La memoria es dinámica, se decide lo que se ocupa en tiempo de ejecución.
-·La vida de los objetos del Heap no depende de la vida de la función que los crea.
+* Facilita la programación.
+* La memoria es dinámica, se decide lo que se ocupa en tiempo de ejecución.
+* La vida de los objetos del Heap no depende de la vida de la función que los crea.
 Problemas del Heap:
-·Hay que encargarse de liberar memoria no usada del heap:
-    a) Manual &rarr; difícil y propenso a bugs ("memory leak"), aunque más rápido.
-    b) Con recolector de basura &rarr; peor rendimiento pero ganas en salud mental.
+* Hay que encargarse de liberar memoria no usada del heap:
+    - a) Manual &rarr; difícil y propenso a bugs ("memory leak"), aunque más rápido.
+    - b) Con recolector de basura &rarr; peor rendimiento pero ganas en salud mental.
 
 
 En lenguajes como Java, los **objetos se almacenan normalmente en el *heap***, una zona de memoria diseñada para datos cuyo tamaño y tiempo de vida no se conocen de antemano. El *heap* permite crear objetos en tiempo de ejecución mediante `new`, y su uso es gestionado por la máquina virtual, no por el programador. En cambio, las variables que solo almacenan referencias a esos objetos suelen ubicarse en la **pila (*stack*)**, pero el objeto real permanece en el *heap*.
@@ -199,7 +199,7 @@ Finalmente, combinar **`static` con `final`** es habitual para definir **constan
 
 Para compilar un programa Java desde la línea de comandos se emplea el compilador `javac`. Este comando toma un archivo `.java` y genera uno o varios ficheros `.class` que contienen el *bytecode*. Por ejemplo, si se tiene una clase pública llamada `Ejercicio1` en `Ejercicio1.java`<span style="color:purple;">\* </span>, se compila con `javac Ejercicio1.java`. Tras la compilación, el programa se ejecuta con el comando java, `java Ejercicio1`, indicando el nombre de la clase **sin** la extensión `.class`, ya que la herramienta `java` busca automáticamente ese archivo en el directorio actual.
 
-<span style="color:purple;">\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase.\*> </span>
+<span style="color:purple;">\*Nota importante: un archivo .java solo puede tener **UNA** clase pública que se debe llamar como el archivo, por eso al usar el comando java no hace falta especificar el nombre del archivo, solo la clase. </span>
 
 Java se considera un lenguaje **compilado e interpretado al mismo tiempo**. Primero se compila a *bytecode*, un formato intermedio independiente del sistema operativo. Después, ese *bytecode* es ejecutado por la **Máquina Virtual de Java (JVM)**, que actúa como un intérprete optimizado. Este modelo permite que el mismo programa funcione en distintos sistemas sin cambiar el código fuente, siempre que exista una JVM disponible para esa plataforma.
 
@@ -215,7 +215,7 @@ Los archivos `.class` contienen el **bytecode**, una representación binaria del
 #### New:
 1) Reserva memoria para un nuevo objeto.
 2) Ejecuta un constructor con ese objeto como objeto actual (this).
-3) Devuelve ese nuevo objeto (now es una expresión).
+3) Devuelve ese nuevo objeto (new es una expresión).
 
 
 `new` es el operador que **crea un objeto** en Java: reserva memoria para él, construye la instancia y devuelve una **referencia** para poder usarla. En el ejemplo de `Punto`, `new Punto()` significa “crear un `Punto` nuevo”, y el resultado se guarda en una variable (la referencia), que permite acceder a sus atributos y métodos. A diferencia de C/C++, no se está “instanciando en la pila” como una variable automática típica, sino creando un objeto gestionado por el entorno de ejecución (normalmente en el *heap*).
@@ -302,7 +302,7 @@ public class Ejercicio1 {
 ### Respuesta
 Al pasar objetos en Java se pasan copias de la referencia.
 
-####Resumen:
+#### Resumen:
 -Datos primitivos (int, long, double, char, boolean): se pasan por **COPIA**.
 -Objetos: se pasa una **COPIA DE LA REFERENCIA**.
 
