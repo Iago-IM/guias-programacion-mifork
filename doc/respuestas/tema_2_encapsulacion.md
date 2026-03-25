@@ -20,9 +20,9 @@ Por favor, escribe en impersonal las respuestas.
 ### Respuesta
 
 Encapsulación es como un escudo, añade protección a mi clase, la cual es un artefacto con estado y comportamiento, que permite ocultar miembros para:
--Garantizar que mi estado interno es siempre válido.
--Evitar que otro código dependa o acceda a partes que no quiero.
--Facilitamos poder cambiar partes sin afectar a otros.
+- Garantizar que mi estado interno es siempre válido.
+- Evitar que otro código dependa o acceda a partes que no quiero.
+- Facilitamos poder cambiar partes sin afectar a otros.
 
 La encapsulación busca agrupar los datos (estado) y las funciones que operan sobre esos datos (comportamiento) en una única entidad o unidad lógica, conocida como clase. Desde la perspectiva de C/C++ clásico, es similar a tomar un `struct` y empaquetar dentro de él también las funciones que lo manipulan, evitando tener los datos por un lado y las funciones globales por el otro. Por su parte, la ocultación de información busca restringir el acceso directo a los detalles internos de esa unidad desde el exterior, exponiendo únicamente lo estrictamente necesario.
 
@@ -63,8 +63,8 @@ Son condiciones que se cumplen durante toda la vida de los objetos de una clase.
 El tipo de dato puede ser también una invariante de clase (aunque en Java esto es automático).
 
 Ejemplos:
-·Persona debe tener edad >= 0.
-·Usuario debe tener contraseña de más de 5 caracteres.
+- Persona debe tener edad >= 0.
+- Usuario debe tener contraseña de más de 5 caracteres.
 
 La ocultación del estado interno permite asegurar la integridad de las invariantes de clase ya que los datos solo se modifican por métodos públicos que pueden comprobar la validez de los nuevos valores.
 
@@ -209,9 +209,9 @@ Los miembros de clase también se pueden y, por lo general, se deben ocultar apl
 ### Respuesta
 
 Tiene sentido si:
--Quiero usar objetos solo a través de "métodos factoría"
--La clase solo tiene miembros clase.
--Controlar el número de instancias que se vea.
+- Quiero usar objetos solo a través de "métodos factoría"
+- La clase solo tiene miembros clase.
+- Controlar el número de instancias que se vea.
 
 Sí, tiene mucho sentido y es una práctica común en ciertos patrones de diseño. Cuando un constructor es declarado como `private`, se impide que cualquier otra clase exterior pueda utilizar la palabra clave `new` para instanciar objetos de esa clase.
 
