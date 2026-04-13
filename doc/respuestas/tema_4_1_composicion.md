@@ -284,6 +284,8 @@ class Departamento {
 
 ### Respuesta
 
+Las excepciones recursivas son un ejemplo de composición recursiva (una excepción tiene una causa, que a su vez es otra excepción con otra causa...)
+
 Una composición recursiva ocurre cuando una clase contiene elementos de su mismo tipo, permitiendo construir estructuras jerárquicas como árboles familiares. La inmutabilidad ayuda a mantener la consistencia del modelo, ya que una vez creada la estructura, no puede modificarse de forma accidental. Así se evita la introducción de ciclos extraños o inconsistencias en la genealogía.
 
 Este tipo de composición aparece también en estructuras habituales como árboles de directorios, expresiones matemáticas representadas como nodos o listas enlazadas. En todos estos casos existe un elemento que contiene referencias a elementos de su propio tipo, formando cadenas o árboles. Es una técnica fundamental para modelar información jerárquica.
@@ -324,5 +326,9 @@ public class Main {
 Una relación de composición bidireccional ocurre cuando ambos objetos participantes mantienen referencias mutuas, es decir, cada uno conoce al otro. Esto obliga a garantizar la coherencia en ambas direcciones, y requiere un diseño cuidadoso para evitar estados incoherentes o referencias que no se correspondan entre sí. Además, deben definirse métodos que aseguren la actualización simultánea de ambas partes.
 
 En el ejemplo de `Profesor` y `Departamento`, habría que añadir un atributo `Departamento` en la clase `Profesor`. Los métodos del departamento que añaden o eliminan profesores deberían actualizar también la referencia inversa en `Profesor`. De igual modo, si un profesor cambiara de departamento, debería notificarse al departamento anterior para eliminarlo de su lista. Este tipo de relación exige coordinación bidireccional para mantenerse consistente.
+
+Las composiciones bidireccionales exigen tener cuidado para mantener la consistencia. Soluciones:
+- Que cada método modificador llame al otro (cuidando los ciclos para evitar un bucle infinito)
+- Solo dejar visible a terceros uno de los métodos modificadores.
 
 ***
