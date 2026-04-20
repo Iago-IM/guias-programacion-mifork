@@ -12,13 +12,13 @@ Por favor, escribe en impersonal las respuestas.
 </prompt>
 ----
 -->
-A continuación se presentan las respuestas solicitadas. Se mantienen un nivel acorde a conocimientos previos en C/C++ estructurado y Java básico (clases, encapsulación, excepciones y composición), y se redactan en forma impersonal.
 
-***
 
 ## 1. En orientación a objetos, ¿qué es la **herencia** y su relación con "A es-un B"? Explica las dos implicaciones principales: (1) **compatibilidad de tipos** y (2) **herencia de estado y comportamiento**. Pon un ejemplo en Java muy sencillo, donde un `Soldado` tiene un `nombre` (privado) y un método `saludar()` que muestra su nombre. Hay dos subtipos: un `Artillero`, que es capaz de disparar cohetes y un `Zapador` que pone minas, ambos heredan el atributo nombre y la capacidad de saludar. Además, y de forma específica, el artillero tiene un número de cohetes y el zapador un número de minas, accesibles mediante "getters" específicos. Respecto a la compatibilidad de tipos, aprovechémosla: crea un array de `Soldado`, mete varios de distinto tipo (son todos compatibles con `Soldado`). Recórrela y que todos te saluden.
 
-
+Tiene dos usos:
+- Compatibilidad de tipos. Ej.: Vehiculo v = new Turismo();
+- Herencia de estado (atributos) y comportamiento (métodos)
 En orientación a objetos, la **herencia** es un mecanismo mediante el cual una clase (subclase) reutiliza y extiende el estado y el comportamiento definidos por otra clase (superclase). Conceptualmente, la herencia modela una relación **“A es-un B”**, lo que significa que un objeto de la subclase puede ser tratado como un objeto de la superclase. Por ejemplo, si `Artillero` hereda de `Soldado`, se puede afirmar que *un artillero es un soldado*.
 
 La primera implicación importante es la **compatibilidad de tipos**. Esto permite que una referencia del tipo de la superclase (`Soldado`) apunte a objetos de cualquiera de sus subclases (`Artillero`, `Zapador`). Gracias a esto, se pueden escribir estructuras de código genéricas (arrays, métodos) que trabajen con el tipo base sin conocer los subtipos concretos, facilitando la reutilización y extensibilidad del programa.
@@ -87,7 +87,7 @@ Si la clase base **no tiene un constructor sin parámetros visible**, entonces e
 
 ***
 
-## 3. Atributos privados de la superclase y memoria
+## 3. Respecto a los objetos de subclases en memoria, los atributos privados de la superclase, ¿forman parte de una instancia de la subclase en memoria? En caso afirmativo ¿implica que se puedan usar desde el código de la subclase? Explícalo con el ejemplo de `Soldado` y alguna de sus subclases.
 
 Desde el punto de vista de la memoria, **los atributos privados de la superclase sí forman parte de la instancia completa de la subclase**. Un objeto `Artillero` contiene en memoria tanto los atributos definidos en `Artillero` como los definidos en `Soldado`, incluyendo los privados. No existe una “separación física” de objetos; todo forma una única instancia.
 
@@ -95,9 +95,11 @@ Sin embargo, el hecho de que esos atributos existan en memoria **no implica que 
 
 En el ejemplo, aunque `Artillero` hereda el estado `nombre`, solo puede interactuar con él mediante métodos públicos o protegidos definidos en `Soldado`, como `saludar()`. Esto permite mantener la encapsulación incluso en presencia de herencia.
 
+Resumen: la subclase hereda los atributos de la clase superior, no se crean dos clases. Los atributos de la clase superior no pueden ser accedidos por la inferior.
+
 ***
 
-## 4. Compatibilidad de tipos y extensibilidad
+## 4. ¿Qué implica en términos de **extensibilidad** de código el hecho de que sean compatibles a nivel de tipos? Ilustra esto añadiendo un nuevo tipo de `Soldado` y demostrando que el código para pedir el saludo a todos los soldados no se modifica.
 
 La compatibilidad de tipos entre superclases y subclases tiene un impacto directo en la **extensibilidad del código**. Permite añadir nuevas subclases sin modificar el código existente que opera sobre el tipo base. Esto es una aplicación directa del principio *abierto/cerrado*: el código está abierto a extensión, pero cerrado a modificación.
 
@@ -118,6 +120,11 @@ El array de `Soldado` y el recorrido que invoca `saludar()` permanecen exactamen
 ***
 
 ## 5. Referencias, upcasting y downcasting
+
+Upcasting: es implícito, siempre funciona y es automático. Ejemplo: Soldado miSoldado = new Artillero("Pepe", 10);
+Tienes disponible lo que ofrezca el tipo de la variable (en este caso las funciones de Soldado) pero no lo que sea ajeno a la clase superior (en este caso Soldado).
+
+DownCasting: explícita (hay que hacerla manualmente). Empleamos el `instanceOf` cuando no tenemos claro la clase de la variable que queremos castear
 
 En Java, es totalmente válido que una **referencia del supertipo apunte a un objeto real de un subtipo**. Esto es precisamente lo que permite el polimorfismo. Por ejemplo, una referencia `Soldado` puede apuntar a un `Artillero` o a un `Zapador`.
 
@@ -171,6 +178,8 @@ Esto permite que cualquier objeto en Java pueda ser tratado de forma genérica c
 
 ## 8. Herencia múltiple
 
+En resumen es que una clase herede de varias. En Java NO está permitido para evitar la herencia en diamante (solo se puede heredar de una clase a la vez, pero se pueden implementar varias interface)
+
 La **herencia múltiple** es la capacidad de una clase para heredar directamente de más de una superclase. Esto permite combinar comportamientos y estados de varias jerarquías, pero introduce problemas de ambigüedad, como el famoso *problema del diamante*.
 
 En Java **no existe herencia múltiple de clases**. Una clase solo puede extender de una única superclase concreta. Esta decisión simplifica el modelo de herencia y evita conflictos en la resolución de métodos y atributos.
@@ -208,6 +217,10 @@ class UsuarioNoEncontradoException extends RuntimeException {
 
 ## 10. Herencia vs. reutilización de código
 
+La herencia es preferible cuando se necesita una abstracción en los métodos de la clase base y también se quiere reutilizar código.
+
+La herencia impone una dependencia muy fuerte de las clases que heredan respecto a la clase base, mientras que en composición se puede usar la clase A en un momento y otra en otro momento (siendo B, C --> A, la referencia puede cambiar durante la ejecución).
+
 No se recomienda usar herencia únicamente para reutilizar código porque la herencia establece una **relación semántica fuerte**. Decir que “A hereda de B” implica que *A es un B*, no solo que reutiliza su implementación. Si esta relación no es conceptualmente correcta, el diseño se vuelve confuso y frágil.
 
 Además, la herencia crea un acoplamiento estrecho entre superclase y subclase. Cambios en la superclase pueden afectar de forma imprevista a todas las subclases, incluso aunque estas no necesiten dichos cambios.
@@ -216,7 +229,7 @@ Por ello, si el objetivo es solo compartir código sin una relación clara “es
 
 ***
 
-## 11. Favorecer la composición frente a la herencia
+## 11. Favorecer la composición frente a la herencia.
 
 Favorecer la **composición** frente a la herencia significa diseñar clases que **contienen** otras clases, en lugar de **ser** otras clases. La composición establece relaciones “tiene-un”, que son más flexibles y menos acopladas.
 
@@ -235,6 +248,8 @@ Esto implica que cambios internos en la superclase, aunque no afecten a su inter
 La composición, en cambio, interactúa principalmente a través de interfaces públicas, preservando mejor los límites de encapsulación.
 
 ***
+
+Hoy en día la herencia está en entredicho. De hecho, en Rust (un lenguaje más moderno) no existe.
 
 ## 13. Pongamos un ejemplo de dos alternativas para lo mismo. Tenemos un `Estudiante` y un `Trabajador`, ambos tienen datos en común: el DNI y el nombre. Modelemos esto de dos formas: uno por herencia, con una superclase `Persona`, y otro con composición, con una clase `DatosPersonales`. Se debe recibir una instancia de `DatosPersonales` en el constructor de la clase `Estudiante` y `Trabajador`.
 
