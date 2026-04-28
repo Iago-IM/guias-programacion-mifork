@@ -262,44 +262,88 @@ En la solución con genéricos, no es posible mezclar tipos de coordenadas dentr
 Respecto a los tipos devueltos, en la solución sin genéricos el método `getX` devuelve `Number`, independientemente del tipo real almacenado. En cambio, en la solución con genéricos, `getX` devuelve `T`, es decir, el tipo concreto utilizado al instanciar el `Punto`, proporcionando mayor precisión y seguridad de tipos para el código cliente.
 
 
-
 ## 11. Hagamos un ejemplo avanzado. El siguiente código, con interfaz `Punto`, que define un método `calcularDistanciaA(Punto p)`, junto con las implementaciones `Punto2D` y `Punto3D`. Añade generics para asegurarnos que la sobreescritura del método calcular distancia a otro `Punto` siempre es sobre un `Punto` del mismo tipo, evitando `instanceof` y el downcasting.
-```java
-public interface Punto { 
-    public double distanciaA(Punto p); 
-} 
-
-public class Punto2D implements Punto { 
-     private final double x, y; 
-     public Punto2D(double x, double y) { 
-        this.x = x; this.y = y; 
-    } 
-
-    @Override 
-    public double distanciaA(Punto p) { 
-        if (p instanceof Punto2D) { 
-            Punto2D p2d = (Punto2D) p; 
-            return Math.sqrt(Math.pow(x - p2d.x, 2) 
-                    + Math.pow(y - p2d.y, 2)); 
-        } else { 
-            throw new RuntimeException("p debe ser Punto 2D"); 
-        } 
-    } 
-} 
-public class Punto3D implements Punto { 
-    // Igual que Punto2D, pero con tres coordenadas
-    ...
-} 
-```
 
 ### Respuesta
 
+El problema del diseño original es que la interfaz `Punto` no expresa, a nivel de tipos, que la distancia solo tiene sentido entre puntos del mismo tipo concreto. Al usar un parámetro `Punto` genérico, el compilador permite comparar un `Punto2D` con un `Punto3D`, obligando a introducir comprobaciones dinámicas con `instanceof` y conversiones explícitas, lo cual degrada el diseño y la seguridad de tipos.
+
+La solución consiste en hacer la interfaz genérica usando un patrón conocido como *F-bounded polymorphism*. Se introduce un parámetro de tipo que representa el propio subtipo concreto. Así, el método `distanciaA` queda tipado de forma que solo acepta puntos del mismo tipo que la implementación concreta.
+
+```java
+public interface Punto<T extends Punto<T>> {
+    double distanciaA(T p);
+}
+```
+
+Cada implementación concreta fija el parámetro de tipo a sí misma. De este modo, la firma del método obliga al compilador a garantizar que los tipos coinciden, eliminando por completo la necesidad de `instanceof` y *downcasting*.
+
+```java
+public class Punto2D implements Punto<Punto2D> {
+    private final double x, y;
+
+    public Punto2D(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public double distanciaA(Punto2D p) {
+        return Math.sqrt(
+            Math.pow(x - p.x, 2) + Math.pow(y - p.y, 2)
+        );
+    }
+}
+```
+
+Una implementación `Punto3D` seguiría exactamente el mismo patrón con tres coordenadas. El compilador impide ahora comparar puntos de dimensiones distintas, reforzando el diseño en tiempo de compilación y evitando errores en tiempo de ejecución.
+
+***
 
 ## 12. Dado que `String` es subtipo de `Object`, ¿significa eso que `List<String>` es subtipo de `List<Object>`? ¿Y que `String[]` es subtipo de `Object[]`? Razona por qué la respuesta es diferente en cada caso y qué problema en tiempo de ejecución puede aparecer con los arrays. A partir de estos ejemplos, define qué significa que un tipo genérico sea **covariante**, **contravariante** o **invariante** respecto a su parámetro de tipo.
 
 ### Respuesta
 
+Aunque `String` es subtipo de `Object`, en Java **no** se cumple que `List<String>` sea subtipo de `List<Object>`. Los tipos genéricos son invariantes respecto a su parámetro de tipo. Permitir lo contrario rompería la seguridad de tipos, ya que se podría insertar en una `List<String>` un objeto que no fuera `String` a través de una referencia `List<Object>`.
+
+En cambio, los arrays en Java **sí** son covariantes, por lo que `String[]` es subtipo de `Object[]`. Esto se permite por razones históricas del lenguaje, pero introduce un problema: el compilador no puede impedir que se intente almacenar un objeto incompatible en tiempo de ejecución. En ese caso, la JVM lanza una `ArrayStoreException`.
+
+```java
+Object[] arr = new String[10];
+arr[0] = Integer.valueOf(5); // Error en tiempo de ejecución
+```
+
+Un tipo genérico es **covariante** si `G<String>` es subtipo de `G<Object>`, **contravariante** si ocurre al revés, e **invariante** si no existe relación de subtipo entre `G<String>` y `G<Object>`. En Java, los genéricos normales son invariantes, mientras que los arrays son covariantes, lo que explica la diferencia de comportamiento y los posibles fallos en ejecución.
+
+***
 
 ## 13. Java permite recuperar covarianza y contravarianza en tipos genéricos de forma controlada mediante **wildcards**. ¿Qué es un wildcard (`?`)? Muestra la diferencia entre `List<? extends T>` y `List<? super T>`, indicando en qué casos se usa cada uno. Pon dos ejemplos: (i) un método que reciba una lista de números y calcule su suma, usando `? extends`; (ii) un método que reciba una lista y le añada varios números enteros, usando `? super`.
 
 ### Respuesta
+
+Un *wildcard* (`?`) es una forma de expresar un tipo genérico desconocido, permitiendo relajar la invariancia de los genéricos de manera segura. Los wildcards siempre se usan en puntos de uso (*use-site variance*), no en la definición de la clase, y permiten declarar rangos de tipos aceptables.
+
+`List<? extends T>` expresa **covarianza**: la lista puede ser de `T` o de cualquier subtipo de `T`. Es apropiada cuando la colección solo se va a leer, ya que el compilador no permite insertar elementos (salvo `null`), porque no conoce el subtipo concreto. Es el enfoque típico para producir valores.
+
+```java
+public static double suma(List<? extends Number> lista) {
+    double resultado = 0.0;
+    for (Number n : lista) {
+        resultado += n.doubleValue();
+    }
+    return resultado;
+}
+```
+
+Por el contrario, `List<? super T>` expresa **contravarianza**: la lista puede ser de `T` o de cualquier supertipo de `T`. Es adecuada cuando se van a insertar elementos, ya que cualquier `T` es compatible con un supertipo. A cambio, al leer elementos solo se garantiza que son de tipo `Object`.
+
+```java
+public static void añadirEnteros(List<? super Integer> lista) {
+    lista.add(1);
+    lista.add(2);
+    lista.add(3);
+}
+```
+
+En resumen, `? extends` se usa cuando se necesita flexibilidad para **leer** datos, y `? super` cuando se necesita flexibilidad para **escribir** datos, expresado habitualmente con la regla: *PECS* (*Producer Extends, Consumer Super*).
+
