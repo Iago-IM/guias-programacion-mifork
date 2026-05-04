@@ -303,15 +303,25 @@ Una implementación `Punto3D` seguiría exactamente el mismo patrón con tres co
 ## 12. Dado que `String` es subtipo de `Object`, ¿significa eso que `List<String>` es subtipo de `List<Object>`? ¿Y que `String[]` es subtipo de `Object[]`? Razona por qué la respuesta es diferente en cada caso y qué problema en tiempo de ejecución puede aparecer con los arrays. A partir de estos ejemplos, define qué significa que un tipo genérico sea **covariante**, **contravariante** o **invariante** respecto a su parámetro de tipo.
 
 ### Respuesta
+Los tipos genéricos son invariantes, mientras que los arrays primitivos tienen covarianza
+
+```java
+String[] misStrings = {"A", "B"};
+Object[] misObjetos = misStrings;
+misObjetos[0] = new Empleado();//Excepción en tiempo de ejecución
+```
+
+Las listas modernas no permiten (a nivel del compilador) esta covarianza
+
+```java
+List<String> misStrings = List.of("A", "B");
+List<Object> misObjetos = misStrings; //error de compilación
+```
+Las 
 
 Aunque `String` es subtipo de `Object`, en Java **no** se cumple que `List<String>` sea subtipo de `List<Object>`. Los tipos genéricos son invariantes respecto a su parámetro de tipo. Permitir lo contrario rompería la seguridad de tipos, ya que se podría insertar en una `List<String>` un objeto que no fuera `String` a través de una referencia `List<Object>`.
 
 En cambio, los arrays en Java **sí** son covariantes, por lo que `String[]` es subtipo de `Object[]`. Esto se permite por razones históricas del lenguaje, pero introduce un problema: el compilador no puede impedir que se intente almacenar un objeto incompatible en tiempo de ejecución. En ese caso, la JVM lanza una `ArrayStoreException`.
-
-```java
-Object[] arr = new String[10];
-arr[0] = Integer.valueOf(5); // Error en tiempo de ejecución
-```
 
 Un tipo genérico es **covariante** si `G<String>` es subtipo de `G<Object>`, **contravariante** si ocurre al revés, e **invariante** si no existe relación de subtipo entre `G<String>` y `G<Object>`. En Java, los genéricos normales son invariantes, mientras que los arrays son covariantes, lo que explica la diferencia de comportamiento y los posibles fallos en ejecución.
 
@@ -321,29 +331,39 @@ Un tipo genérico es **covariante** si `G<String>` es subtipo de `G<Object>`, **
 
 ### Respuesta
 
+Se pueden crear listas de cualquier subtipo de una clase usando:
+```java
+List<? extends Number>
+```
+- Llamo a métodos que **devuelven** valor genérico (get(0) --> devuelve Number)
+- *Llamo a métodos que reciben valor genérico (add(T)) --> error de compilación*
+
+o de cualquier supertipo empleando:
+```java
+List<? super String>
+```
+- Llamo a métodos que **reciben** un valor genérico (ej.: reciben String)
+- *Llamo a métodos que devuelven valor genérico (T get(0) --> devuelve Object)*
+
+En resumen, `? extends` se usa cuando se necesita flexibilidad para **leer** datos, y `? super` cuando se necesita flexibilidad para **escribir** datos, expresado habitualmente con la regla: *PECS* (*Producer Extends, Consumer Super*).
+
+Ejemplos:
+```java
+static double sumaTodos(List<? extends Number> numeros){
+    Number n = numeros.get(i);// Aquí empleamos la lista como producer
+}
+
+static void addNumeros(List<? super Number> numeros){
+    Number n = ...
+    numeros.add(n);// Aquí empleamos la lista como consumer
+}
+```
+***
+
 Un *wildcard* (`?`) es una forma de expresar un tipo genérico desconocido, permitiendo relajar la invariancia de los genéricos de manera segura. Los wildcards siempre se usan en puntos de uso (*use-site variance*), no en la definición de la clase, y permiten declarar rangos de tipos aceptables.
 
 `List<? extends T>` expresa **covarianza**: la lista puede ser de `T` o de cualquier subtipo de `T`. Es apropiada cuando la colección solo se va a leer, ya que el compilador no permite insertar elementos (salvo `null`), porque no conoce el subtipo concreto. Es el enfoque típico para producir valores.
 
-```java
-public static double suma(List<? extends Number> lista) {
-    double resultado = 0.0;
-    for (Number n : lista) {
-        resultado += n.doubleValue();
-    }
-    return resultado;
-}
-```
-
 Por el contrario, `List<? super T>` expresa **contravarianza**: la lista puede ser de `T` o de cualquier supertipo de `T`. Es adecuada cuando se van a insertar elementos, ya que cualquier `T` es compatible con un supertipo. A cambio, al leer elementos solo se garantiza que son de tipo `Object`.
 
-```java
-public static void añadirEnteros(List<? super Integer> lista) {
-    lista.add(1);
-    lista.add(2);
-    lista.add(3);
-}
-```
-
-En resumen, `? extends` se usa cuando se necesita flexibilidad para **leer** datos, y `? super` cuando se necesita flexibilidad para **escribir** datos, expresado habitualmente con la regla: *PECS* (*Producer Extends, Consumer Super*).
 
