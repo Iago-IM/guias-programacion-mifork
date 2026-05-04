@@ -12,12 +12,17 @@ Por favor, escribe en impersonal las respuestas.
 </prompt>
 ----
 -->
-
-A continuación se presentan las preguntas **intactas** junto con sus respuestas, redactadas en **estilo impersonal**, adaptadas a los conocimientos indicados y cumpliendo la longitud solicitada (2–4 párrafos por respuesta, sin contar el código).
-
-***
-
 # TEMA 7. Aspectos funcionales
+
+## Conceptos básicos:
+### Programación funcional
+1) **Objetivo**: que las funciones sean "ciudadanos de primera clase", es decir, sean un tipo/valor más:
+    - Pueden ser asignadas a variables
+    - Pueden ser recibidas como parametros
+    - Pueden ser devueltas en otras funciones
+2) **Expresión lambda**: expresa un valor de tipo función (no tiene nombre, solo cabeza y cuerpo)
+3) **Closures**: una expresión lambda captura valores del contexto donde **ES DECLARADA**
+4) En lenguajes con comprobación estática de tipos (ej.: Java, C#, Typescript...) ¿Qué tipo tienen?
 
 ## 1. ¿Qué es un puntero a una función? Pon un ejemplo de código en C, donde se define una función y que reciba una cadena de caracteres como parámetro y devuelva la cadena en mayúsculas. Crea un puntero en una variable local a dicha función llamado `aMayusculas` e invócala con el puntero.
 
@@ -175,6 +180,21 @@ Function<String, String> transformar = t -> t + sufijo;
 System.out.println(transformar.apply("hola"));
 ```
 
+Otro ejemplo:
+```java
+public static Function<Double, Double> crearDescuento(int descuento){
+    return cantidad -> cantidad * (1 - descuento/100);
+}
+
+public static void main(...){
+    Function<Double, Double> descuento25 = crearDescuento(25);
+    Function<Double, Double> descuento30 = crearDescuento(30);
+
+    double reducido1 = descuento25.apply(500);
+    double reducido2 = descuento30.apply(800);
+}
+```
+
 ***
 
 ## 8. Reflexiona: ¿en qué se diferencia entonces una función lambda de los punteros a funciones que hay en C?
@@ -217,11 +237,23 @@ System.out.println(dto20.apply(100.0));
 
 ### Respuesta
 
-Una interfaz funcional es una interfaz que define exactamente un método abstracto. Este método representa la operación que implementará la función lambda asociada al tipo.
+Una interfaz funcional es una interfaz que define exactamente un único método abstracto. Este método representa la operación que implementará la función lambda asociada al tipo.
 
 Java utiliza interfaces funcionales como puente entre el sistema de tipos estático y las funciones lambda. El compilador infiere qué método implementar a partir de la signatura.
 
-Pueden contener métodos `default` o `static`, pero solo un método abstracto. La anotación `@FunctionalInterface` es opcional, pero recomendable.
+Pueden contener métodos `default` o `static`, pero solo un método abstracto.
+La anotación `@FunctionalInterface` es opcional, pero recomendable.
+
+ejemplo:
+```java
+@FunctionalInterface // Opcional
+public interface Transformador{
+    public String transformar(String entrada);
+}
+main(){
+    Transformador miTrafo = s -> s.toUpper();
+}
+```
 
 ***
 
@@ -275,6 +307,13 @@ Entre las más importantes se encuentran `Function<T,R>`, `Consumer<T>`, `Suppli
 
 También existen variantes especializadas para tipos primitivos, como `IntFunction`, `DoubleConsumer` o `LongPredicate`, que evitan el *boxing* innecesario.
 
+### Interfaces funcionales de la librería estándar:
+- Function <E, S> || S apply(E)
+- BiFunction <E1, E2, S> || S apply(E1, E2)
+- Supplier<T> ||T get()
+- Consumer<T> || void accept(T)
+- Predicate<T> || bool test(T)
+...
 ***
 
 ## 14. Vamos a ver ejemplos expresivos de funcional en Java. Estudiemos el `List.forEach`, como versión funcional del bucle `for`. Emplea el `forEach` para recorrer una lista de `Integer` y que muestre un mensaje si el entero es positivo.
