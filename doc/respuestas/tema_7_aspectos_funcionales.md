@@ -308,11 +308,14 @@ Entre las más importantes se encuentran `Function<T,R>`, `Consumer<T>`, `Suppli
 También existen variantes especializadas para tipos primitivos, como `IntFunction`, `DoubleConsumer` o `LongPredicate`, que evitan el *boxing* innecesario.
 
 ### Interfaces funcionales de la librería estándar:
-- Function <E, S> || S apply(E)
-- BiFunction <E1, E2, S> || S apply(E1, E2)
-- Supplier<T> ||T get()
-- Consumer<T> || void accept(T)
-- Predicate<T> || bool test(T)
+- Function <E, S>       || S apply(E)
+- BiFunction <E1, E2, S>|| S apply(E1, E2)
+- Supplier<T>           ||T get()
+- Consumer<T>           || void accept(T)
+- Predicate<T>          || bool test(T)
+- Runnable              || void run();
+
+No se permite la sobrecarga de interfaces funcionales (que dos interfaces funcionales tengan el mismo nombre pero distintos parámetros)
 ...
 ***
 
@@ -336,13 +339,15 @@ numeros.forEach(n -> {
 });
 ```
 
+El for each no espera que la función devuelva nada, por lo que siempre se usan consumer.
+
 ***
 
 ## 15. Repasando el tema de genericidad, fíjate en la firma de `forEach`, ¿por qué se usa `Consumer<? super T>` y no `Consumer<T>`? Explica qué significa **PECS**, y explícalo para el caso de mejorar el ejemplo del método `transformar` la hora de definir el tipo de la función transformadora.
 
 ### Respuesta
 
-La firma `Consumer<? super T>` sigue el principio **PECS**: *Producer Extends, Consumer Super*. Indica que si un parámetro consume valores de tipo `T`, se debe usar `? super T`.
+La firma `Consumer<? super T>` sigue el principio **PECS**: *Producer Extends, Consumer Super*. Indica que si un parámetro consume valores de tipo `T`, se debe usar `? super T`. Si se produce un parámetro, se usa `extends`
 
 Esto permite pasar consumidores que acepten tipos más generales que `T`, aumentando la flexibilidad del código sin perder seguridad de tipos.
 
@@ -353,6 +358,30 @@ Aplicado al método `transformar`, si la función consume un `String`, podría a
 ## 16. Referencias a métodos. Podemos obtener una referencia a métodos de objetos o clases. Pon un ejemplo en JavaScript y en Java, de una clase `Persona` con un método `saludar`. En el código principal, crea una `Persona` con un nombre, y obtén una referencia a su método `saludar` en una variable local. Invoca `saludar` con esa referencia a su método `saludar`.
 
 ### Respuesta
+Una interfaz pueder ser instanciada:
+- Con una expresión lambda.
+- Creando mi propia clase que implemente la interfaz funcional (no se usa)
+    ```java
+    Function<Integer, Integer> f = new MiFuncionSobreEnteros();
+    ```
+- Referencia a método ( :: ) --> nos ahorramos hacer una expresión lambda, existen 4 casos:
+    ```java
+    class Persona {
+        public Persona(String nombre){...}
+        
+        public static Integer cuantasHay(){...}
+
+        public boolean haViajadoA(Ciudad c){...}
+
+    }
+    ```
+    * **A método estático (Clase::método)**: `Persona::cuantasHay --encaja con-> Supplier<Integer>`
+
+    * **A constructor (clase::new)**: `function<String, Persona>`
+
+    * **A método de instancia**: 
+        1) Sin instancia conocida (Clase::método). Ej: `Persona::haViajadoA --encaja con-> BiPredicate<Persona, Ciudad>`
+        2) Con instancia conocida (instancia::método). Ej: `pepe::haViajadoA --encaja con-> Predicate<Ciudad>`
 
 Las referencias a métodos permiten reutilizar métodos existentes como funciones, sin necesidad de definir lambdas explícitas. Son una forma más concisa y legible cuando la firma coincide.
 
