@@ -21,7 +21,7 @@ Por favor, escribe en impersonal las respuestas.
     - Pueden ser recibidas como parametros
     - Pueden ser devueltas en otras funciones
 2) **Expresión lambda**: expresa un valor de tipo función (no tiene nombre, solo cabeza y cuerpo)
-3) **Closures**: una expresión lambda captura valores del contexto donde **ES DECLARADA**
+3) **Closures**: una expresión lambda captura valores del contexto **DONDE ES DECLARADA**
 4) En lenguajes con comprobación estática de tipos (ej.: Java, C#, Typescript...) ¿Qué tipo tienen?
 
 ## 1. ¿Qué es un puntero a una función? Pon un ejemplo de código en C, donde se define una función y que reciba una cadena de caracteres como parámetro y devuelva la cadena en mayúsculas. Crea un puntero en una variable local a dicha función llamado `aMayusculas` e invócala con el puntero.

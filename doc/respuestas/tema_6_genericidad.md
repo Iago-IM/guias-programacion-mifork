@@ -12,10 +12,6 @@ Por favor, escribe en impersonal las respuestas.
 </prompt>
 ----
 -->
-A continuación se desarrollan las respuestas solicitadas, adaptadas a los conocimientos indicados y manteniendo estilo impersonal, con una longitud de entre 2 y 4 párrafos por respuesta (sin contar los fragmentos de código).
-
-***
-
 # TEMA 6. Genericidad
 
 ## 1. Empleando `void*` en C o `Object` en Java, pon un ejemplo de una estructura de datos, que empleando un array primitivo, permita alojar cualquier tipo de dato.
@@ -317,7 +313,6 @@ Las listas modernas no permiten (a nivel del compilador) esta covarianza
 List<String> misStrings = List.of("A", "B");
 List<Object> misObjetos = misStrings; //error de compilación
 ```
-Las 
 
 Aunque `String` es subtipo de `Object`, en Java **no** se cumple que `List<String>` sea subtipo de `List<Object>`. Los tipos genéricos son invariantes respecto a su parámetro de tipo. Permitir lo contrario rompería la seguridad de tipos, ya que se podría insertar en una `List<String>` un objeto que no fuera `String` a través de una referencia `List<Object>`.
 
